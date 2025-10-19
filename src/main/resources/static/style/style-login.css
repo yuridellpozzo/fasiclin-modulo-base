@@ -1,0 +1,61 @@
+/* =================================================================== */
+/* BACKGROUND DE IMAGEM PARA A TELA DE LOGIN */
+/* =================================================================== */
+body {
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh; /* Garante que o body ocupe a altura total */
+    position: relative; /* Necessário para o overlay */
+    background-color: #212529; /* Cor de fundo caso a imagem não carregue */
+}
+
+/* Adiciona a imagem de fundo e garante que ela cubra a tela */
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/img/logo-tela-inicial.png'); /* Substitua pelo caminho correto da sua imagem */
+    background-size: cover; /* A imagem cobrirá toda a área, cortando se necessário */
+    background-position: center center; /* Centraliza a imagem */
+    background-repeat: no-repeat; /* Evita repetição */
+    opacity: 0.3; /* Ajuste a opacidade para a imagem ser mais ou menos visível */
+    z-index: -1; /* Coloca a imagem atrás de todo o conteúdo */
+}
+
+/* =================================================================== */
+/* UTILIDADES DE LAYOUT */
+/* =================================================================== */
+
+.vh-100 {
+    height: 100vh;
+}
+
+/* =================================================================== */
+/* ESTILIZAÇÃO DO CARD DE LOGIN (SEMI-TRANSPARENTE) */
+/* =================================================================== */
+.card.bg-secondary {
+    /* Usamos RGBA para definir a cor preta (#000000) com 80% de opacidade (0.8) */
+    background-color: rgba(0, 0, 0, 0.8) !important; 
+    border: none;
+    /* Adicione um padding um pouco maior para espaçar bem o conteúdo */
+    padding: 2rem !important; 
+    border-radius: 0.5rem; /* Adiciona um arredondamento sutil */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); /* Adiciona uma sombra para profundidade */
+}
+
+/* ... (Mantenha os outros estilos do seu style-login.css) ... */
+
+/* Opcional: Estilo para o botão de Login (Verde) */
+.btn-success {
+    /* Aplica a mesma borda suave dos botões da tela principal (padrão Bootstrap) */
+    border-radius: 0.375rem; 
+}
+
+/* Opcional: Adiciona um efeito sutil ao passar o mouse no botão de login */
+.btn-success:hover {
+    opacity: 0.9;
+    transform: scale(1.01);
+    transition: all 0.2s ease-in-out;
+}
