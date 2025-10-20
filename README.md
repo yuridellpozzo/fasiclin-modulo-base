@@ -18,15 +18,15 @@
   ![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
 
   <p>
-    <img src="https://img.shields.io/github/actions/workflow/status/matheusassuncaoo/fasiclin-estoque/main.yml?style=for-the-badge&branch=main" alt="Build Status">
-    <img src="https://img.shields.io/github/license/matheusassuncaoo/fasiclin-estoque?style=for-the-badge" alt="Licença">
-    <img src="https://img.shields.io/github/last-commit/matheusassuncaoo/fasiclin-estoque?style=for-the-badge" alt="Último Commit">
+    <img src="https://img.shields.io/github/actions/workflow/status/yuridellpozzo/fasiclin-modulo-base/main.yml?style=for-the-badge&branch=main" alt="Build Status">
+    <img src="https://img.shields.io/github/license/yuridellpozzo/fasiclin-modulo-base?style=for-the-badge" alt="Licença">
+    <img src="https://img.shields.io/github/last-commit/yuridellpozzo/fasiclin-modulo-base?style=for-the-badge" alt="Último Commit">
   </p>
 </div>
 
 ## 🎯 Sobre o Projeto
 
-A **API Fasiclin Estoque** é o backend de um sistema para controle de inventário. A aplicação permite o gerenciamento completo de produtos, fornecedores, entradas e saídas, fornecendo uma base sólida e escalável para qualquer sistema de frontend (web ou mobile) que precise consumir esses dados.
+A **API Fasiclin biomedicina** é o backend de um sistema para controle de inventário. A aplicação permite o gerenciamento completo de produtos, fornecedores, entradas e saídas, fornecendo uma base sólida e escalável para qualquer sistema de frontend (web ou mobile) que precise consumir esses dados.
 
 Este projeto acadêmico foi desenvolvido seguindo as melhores práticas de APIs REST, garantindo uma comunicação padronizada, segura e eficiente.
 
@@ -39,11 +39,11 @@ Este é o planejamento de entregas do projeto. Conforme as funcionalidades forem
 -   [ ] **Módulo de Produtos:** CRUD completo (Create, Read, Update, Delete).
 -   [ ] **Módulo de Fornecedores:** CRUD completo.
 -   [ ] **Módulo de Categorias:** CRUD completo e associação com produtos.
--   [ ] **Controle de Movimentação:** Endpoints para registrar entradas e saídas de estoque.
+-   [ ] **Controle de Movimentação:** Endpoints para registrar entradas e saídas de biomedicina.
 -   [ ] **Validações:** Implementar Bean Validation nas entidades e DTOs.
 -   [ ] **Tratamento de Exceções:** Criar handlers para exceções de negócio e de sistema.
 -   [ ] **Segurança:** Implementar autenticação e autorização com Spring Security e JWT.
--   [ ] **Relatórios:** Endpoints para gerar relatórios básicos de estoque.
+-   [ ] **Relatórios:** Endpoints para gerar relatórios básicos de biomedicina.
 -   [ ] **Documentação:** Gerar documentação da API com Swagger/OpenAPI.
 
 ---
@@ -81,8 +81,8 @@ Antes de começar, você vai precisar ter instalado em sua máquina:
 
 1.  **Clone o repositório da API:**
     ```bash
-    git clone [https://github.com/matheusassuncaoo/fasiclin-estoque.git](https://github.com/matheusassuncaoo/fasiclin-estoque.git)
-    cd fasiclin-estoque
+    git clone [https://github.com/yuridellpozzo/fasiclin-modulo-base.git](https://github.com/yuridellpozzo/fasiclin-modulo-base.git)
+    cd fasiclin-modulo-base
     ```
 
 2.  **Configure o Banco de Dados:**
@@ -115,7 +115,7 @@ Antes de começar, você vai precisar ter instalado em sua máquina:
 
 Agradecemos a todos que contribuíram para este projeto!
 
-<a href="https://github.com/matheusassuncaoo/fasiclin-estoque/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=matheusassuncaoo/fasiclin-estoque" alt="Contribuidores" title="Contribuidores do Fasiclin Estoque"/>
+<a href="https://github.com/yuridellpozzo/fasiclin-modulo-base/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=yuridellpozzo/fasiclin-modulo-base" alt="Contribuidores" title="Contribuidores do Fasiclin biomedicina"/>
 </a>
-"# fasiclin-biomedicina"  
+"# fasiclin-modulo-base"  
