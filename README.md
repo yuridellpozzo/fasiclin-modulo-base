@@ -1,5 +1,4 @@
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/20a36d8d-228f-410b-a4b8-992b18d334db" alt="" width="450"/>
   <h1>📦 Fasiclin Biomedicina</h1>
   <p>
     <strong>API RESTful para o sistema do curso de Biomedicina da "Fasiclin", construída com Java e Spring Boot.</strong>
