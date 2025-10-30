@@ -2,6 +2,8 @@ package com.br.fasipe.menubase.biomedicina.models;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "PROFISSIONAL")
@@ -11,41 +13,53 @@ public class Profissional implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "IDPROFISSIO")
-    private Integer id;
+    private Integer idprofissio;
 
-    // Coluna do supervisor, baseado no seu banco
     @Column(name = "ID_SUPPROFI")
     private Integer idSupprofi;
 
-    // Relacionamento com PessoaFis (para buscar o nome)
     @OneToOne
     @JoinColumn(name = "ID_PESSOAFIS")
     private PessoaFis pessoaFis;
 
-    // Construtor vazio
-    public Profissional() {}
+    // --- MUDANÇA AQUI ---
+    // Mapeia a tabela PROFI_ESPEC
+    // Carrega as especialidades do profissional
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "PROFI_ESPEC",
+        joinColumns = @JoinColumn(name = "ID_PROFISSIO"),
+        inverseJoinColumns = @JoinColumn(name = "ID_ESPEC")
+    )
+    private Set<Especialidade> especialidades = new HashSet<>();
+    
+    // --- FIM DA MUDANÇA ---
 
     // Getters e Setters
-    public Integer getId() {
-        return id;
+    public Integer getIdprofissio() {
+        return idprofissio;
     }
-    public void setId(Integer id) {
-        this.id = id;
+    public void setIdprofissio(Integer idprofissio) {
+        this.idprofissio = idprofissio;
     }
-
-    // Getter para o ID do supervisor
     public Integer getIdSupprofi() {
         return idSupprofi;
     }
     public void setIdSupprofi(Integer idSupprofi) {
         this.idSupprofi = idSupprofi;
     }
-
-    // Getter para o objeto PessoaFis
     public PessoaFis getPessoaFis() {
         return pessoaFis;
     }
     public void setPessoaFis(PessoaFis pessoaFis) {
         this.pessoaFis = pessoaFis;
+    }
+
+    // Getter para as novas especialidades
+    public Set<Especialidade> getEspecialidades() {
+        return especialidades;
+    }
+    public void setEspecialidades(Set<Especialidade> especialidades) {
+        this.especialidades = especialidades;
     }
 }

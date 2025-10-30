@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface SetorRepository extends JpaRepository<Setor, Integer> {
     // Agora o método retorna uma lista de setores, pois um profissional pode estar em vários.
-    List<Setor> findByProfissionalId(Integer id);
+    List<Setor> findByProfissionalIdprofissio(Integer id);
 
     Optional<Setor> findByNome(String nome);
     boolean existsByNome(String nome);

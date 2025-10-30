@@ -1,9 +1,9 @@
 package com.br.fasipe.menubase.biomedicina.models;
 
 import jakarta.persistence.*;
-import java.util.HashSet; // Importar
+import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set; // Importar
+import java.util.Set;
 
 @Entity
 @Table(name = "USUARIO")
@@ -24,14 +24,14 @@ public class Usuario {
     @JoinColumn(name = "ID_PROFISSIO")
     private Profissional profissional;
 
-    // --- ADICIONADO ---
-    // Mapeia o link direto com PESSOAFIS que existe no seu banco
+    // --- MUDANÇA AQUI ---
+    // Mapeia o link direto com PESSOAFIS
     @OneToOne
     @JoinColumn(name = "ID_PESSOAFIS")
     private PessoaFis pessoaFis;
 
-    // --- ADICIONADO ---
     // Mapeia a tabela de permissões (USUAPERMIUSUA)
+    // (Mantido da nossa última alteração)
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "USUAPERMIUSUA",
@@ -39,11 +39,7 @@ public class Usuario {
         inverseJoinColumns = @JoinColumn(name = "ID_PERMIUSUA")
     )
     private Set<Permiusua> permissoes = new HashSet<>();
-    
-    // --- FIM DAS ADIÇÕES ---
-
-    public Usuario() {
-    }
+    // --- FIM DA MUDANÇA ---
 
     // Getters e Setters
     public Integer getId() { return id; }
@@ -55,13 +51,14 @@ public class Usuario {
     public Profissional getProfissional() { return profissional; }
     public void setProfissional(Profissional profissional) { this.profissional = profissional; }
 
-    // --- NOVOS GETTERS E SETTERS ---
+    // Getter/Setter para PessoaFis
     public PessoaFis getPessoaFis() { return pessoaFis; }
     public void setPessoaFis(PessoaFis pessoaFis) { this.pessoaFis = pessoaFis; }
+    
     public Set<Permiusua> getPermissoes() { return permissoes; }
     public void setPermissoes(Set<Permiusua> permissoes) { this.permissoes = permissoes; }
-    // --- FIM DOS NOVOS GETTERS E SETTERS ---
 
+    // ... (métodos equals e hashCode) ...
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

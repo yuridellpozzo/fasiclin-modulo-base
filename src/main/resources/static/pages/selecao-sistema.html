@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="/style/style-selecao.css">
+    
+    <title>Seleção de Sistema</title>
+</head>
+<body>
+    
+    <div class="container d-flex justify-content-center align-items-center vh-100">
+        <div class="selection-card">
+            <h2 class="card-title text-center mb-4">Seleção de Sistema</h2>
+            <p class="text-center text-muted mb-4">Como Administrador, por favor, escolha o módulo que deseja gerenciar.</p>
+            
+            <div class="d-grid gap-3">
+                <button class="btn btn-primary btn-lg system-select-btn" data-system="BIOMEDICINA">Biomedicina</button>
+                <button class="btn btn-primary btn-lg system-select-btn" data-system="ODONTOLOGIA">Odontologia</button>
+                <button class="btn btn-primary btn-lg system-select-btn" data-system="NUTRICAO">Nutrição</button>
+                <button class="btn btn-primary btn-lg system-select-btn" data-system="PSICOLOGIA">Psicologia</button>
+                <button class="btn btn-primary btn-lg system-select-btn" data-system="FISIOTERAPIA">Fisioterapia</button>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="#" id="admin-logout" class="text-secondary">Sair (Logout)</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="/selecao-sistema.js"></script>
+</body>
+</html>

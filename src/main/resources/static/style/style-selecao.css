@@ -1,0 +1,48 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    /* Fundo branco (o mesmo do seu login.html) */
+    background-color: #ffffff; 
+}
+
+.selection-card {
+    width: 100%;
+    max-width: 500px;
+    padding: 2.5rem;
+    border-radius: 0.5rem;
+    /* Sombra suave para destacar o card */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); 
+    background-color: #f8f9fa; /* Um fundo cinza muito claro para o card */
+    border: 1px solid #dee2e6;
+}
+
+.card-title {
+    font-weight: 700;
+    color: #0056b3; /* Azul escuro para o título */
+}
+
+.system-select-btn {
+    padding: 0.75rem 1.25rem;
+    font-size: 1.1rem;
+    font-weight: 400;
+    /* Cor azul padrão do seu tema */
+    background-color: #007bff;
+    border-color: #007bff;
+    transition: all 0.2s ease-in-out;
+}
+
+.system-select-btn:hover {
+    /* Azul mais escuro no hover (o mesmo do seu tema) */
+    background-color: #0056b3;
+    border-color: #0056b3;
+    transform: scale(1.02);
+}
+
+#admin-logout {
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+#admin-logout:hover {
+    color: #dc3545 !important; /* Vermelho no hover (igual ao seu botão Sair) */
+    text-decoration: underline;
+}
