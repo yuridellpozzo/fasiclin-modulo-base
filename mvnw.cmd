@@ -1,115 +1,182 @@
-<# : batch portion
 @REM ----------------------------------------------------------------------------
-@REM Copyright 2022-2024 the original author or authors.
+@REM Licensed to the Apache Software Foundation (ASF) under one
+@REM or more contributor license agreements.  See the NOTICE file
+@REM distributed with this work for additional information
+@REM regarding copyright ownership.  The ASF licenses this file
+@REM to you under the Apache License, Version 2.0 (the
+@REM "License"); you may not use this file except in compliance
+@REM with the License.  You may obtain a copy of the License at
 @REM
-@REM Licensed under the Apache License, Version 2.0 (the "License");
-@REM you may not use this file except in compliance with the License.
-@REM You may obtain a copy of the License at
+@REM    http://www.apache.org/licenses/LICENSE-2.0
 @REM
-@REM      https://www.apache.org/licenses/LICENSE-2.0
-@REM
-@REM Unless required by applicable law or agreed to in writing, software
-@REM distributed under the License is distributed on an "AS IS" BASIS,
-@REM WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-@REM See the License for the specific language governing permissions and
-@REM limitations under the License.
+@REM Unless required by applicable law or agreed to in writing,
+@REM software distributed under the License is distributed on an
+@REM "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+@REM KIND, either express or implied.  See the License for the
+@REM specific language governing permissions and limitations
+@REM under the License.
 @REM ----------------------------------------------------------------------------
 
 @REM ----------------------------------------------------------------------------
-@REM Maven Wrapper startup script for Windows
+@REM Maven Start Up Batch script
+@REM
+@REM Required ENV vars:
+@REM JAVA_HOME - location of a JDK home dir
 @REM
 @REM Optional ENV vars
-@REM   MAVEN_OPTS - parameters passed to the Java VM when running Maven
-@REM   MAVEN_SKIP_RC - flag to disable loading of mavenrc files
+@REM M2_HOME - location of maven2's installed home dir
+@REM MAVEN_BATCH_ECHO - set to 'on' to enable the echoing of the batch commands
+@REM MAVEN_BATCH_PAUSE - set to 'on' to wait for a keystroke before ending
+@REM MAVEN_OPTS - parameters passed to the Java VM when running Maven
+@REM     e.g. to debug Maven itself, use
+@REM set MAVEN_OPTS=-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=8000
+@REM MAVEN_SKIP_RC - flag to disable loading of mavenrc files
 @REM ----------------------------------------------------------------------------
 
-@ECHO OFF
+@REM Begin all REM lines with '@' in case MAVEN_BATCH_ECHO is 'on'
+@echo off
+@REM set title of command window
+title %0
+@REM enable echoing by setting MAVEN_BATCH_ECHO to 'on'
+@if "%MAVEN_BATCH_ECHO%" == "on"  echo %MAVEN_BATCH_ECHO%
 
-SETLOCAL
+@REM set %HOME% to equivalent of $HOME
+if "%HOME%" == "" (set "HOME=%HOMEDRIVE%%HOMEPATH%")
 
-SET "MAVEN_PROJECT_DIR=%~dp0"
+@REM Execute a user defined script before this one
+if not "%MAVEN_SKIP_RC%" == "" goto skipRcPre
+@REM check for pre script, once with legacy .bat ending and once with .cmd ending
+if exist "%HOME%\mavenrc_pre.bat" call "%HOME%\mavenrc_pre.bat"
+if exist "%HOME%\mavenrc_pre.cmd" call "%HOME%\mavenrc_pre.cmd"
+:skipRcPre
 
-SET "MVNW_VERBOSE=false"
-IF "%1" == "-v" SET "MVNW_VERBOSE=true"
-IF "%1" == "--verbose" SET "MVNW_VERBOSE=true"
+@setlocal
 
-FOR /F "usebackq tokens=1,2 delims==" %%A IN ("%MAVEN_PROJECT_DIR%/.mvn/wrapper/maven-wrapper.properties") DO (
-    IF "%%A"=="wrapperUrl" SET "MVNW_WRAPPER_URL=%%B"
+set ERROR_CODE=0
+
+@REM To isolate internal variables from possible post scripts, we use another setlocal
+@setlocal
+
+@REM ==== START VALIDATION ====
+if not "%JAVA_HOME%" == "" goto OkJHome
+
+echo.
+echo Error: JAVA_HOME not found in your environment. >&2
+echo Please set the JAVA_HOME variable in your environment to match the >&2
+echo location of your Java installation. >&2
+echo.
+goto error
+
+:OkJHome
+if exist "%JAVA_HOME%\bin\java.exe" goto init
+
+echo.
+echo Error: JAVA_HOME is set to an invalid directory. >&2
+echo JAVA_HOME = "%JAVA_HOME%" >&2
+echo Please set the JAVA_HOME variable in your environment to match the >&2
+echo location of your Java installation. >&2
+echo.
+goto error
+
+@REM ==== END VALIDATION ====
+
+:init
+
+@REM Find the project base dir, i.e. the directory that contains the folder ".mvn".
+@REM Fallback to current working directory if not found.
+
+set MAVEN_PROJECTBASEDIR=%MAVEN_BASEDIR%
+IF NOT "%MAVEN_PROJECTBASEDIR%"=="" goto endDetectBaseDir
+
+set EXEC_DIR=%CD%
+set WDIR=%EXEC_DIR%
+:findBaseDir
+IF EXIST "%WDIR%"\.mvn goto baseDirFound
+cd ..
+IF "%WDIR%"=="%CD%" goto baseDirNotFound
+set WDIR=%CD%
+goto findBaseDir
+
+:baseDirFound
+set MAVEN_PROJECTBASEDIR=%WDIR%
+cd "%EXEC_DIR%"
+goto endDetectBaseDir
+
+:baseDirNotFound
+set MAVEN_PROJECTBASEDIR=%EXEC_DIR%
+cd "%EXEC_DIR%"
+
+:endDetectBaseDir
+
+IF NOT EXIST "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" goto endReadAdditionalConfig
+
+@setlocal EnableExtensions EnableDelayedExpansion
+for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do set JVM_CONFIG_MAVEN_PROPS=!JVM_CONFIG_MAVEN_PROPS! %%a
+@endlocal & set JVM_CONFIG_MAVEN_PROPS=%JVM_CONFIG_MAVEN_PROPS%
+
+:endReadAdditionalConfig
+
+SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
+set WRAPPER_JAR="%MAVEN_PROJECTBASEDIR%\.mvn\wrapper\maven-wrapper.jar"
+set WRAPPER_LAUNCHER=org.apache.maven.wrapper.MavenWrapperMain
+
+set DOWNLOAD_URL="https://repo.maven.apache.org/maven2/io/takari/maven-wrapper/0.5.6/maven-wrapper-0.5.6.jar"
+
+FOR /F "tokens=1,2 delims==" %%A IN ("%MAVEN_PROJECTBASEDIR%\.mvn\wrapper\maven-wrapper.properties") DO (
+    IF "%%A"=="wrapperUrl" SET DOWNLOAD_URL=%%B
 )
 
-IF NOT DEFINED MVNW_WRAPPER_URL (
-  ECHO Could not locate the Maven Wrapper properties file at '%MAVEN_PROJECT_DIR%/.mvn/wrapper/maven-wrapper.properties'.
-  GOTO :eof_error
-)
+@REM Extension to allow automatically downloading the maven-wrapper.jar from Maven-central
+@REM This allows using the maven wrapper in projects that prohibit checking in binary data.
+if exist %WRAPPER_JAR% (
+    if "%MVNW_VERBOSE%" == "true" (
+        echo Found %WRAPPER_JAR%
+    )
+) else (
+    if not "%MVNW_REPOURL%" == "" (
+        SET DOWNLOAD_URL="%MVNW_REPOURL%/io/takari/maven-wrapper/0.5.6/maven-wrapper-0.5.6.jar"
+    )
+    if "%MVNW_VERBOSE%" == "true" (
+        echo Couldn't find %WRAPPER_JAR%, downloading it ...
+        echo Downloading from: %DOWNLOAD_URL%
+    )
 
-SET "MVNW_WRAPPER_JAR_BASE_NAME=%MVNW_WRAPPER_URL:/=%"
-SET "MVNW_WRAPPER_JAR_BASE_NAME=%MVNW_WRAPPER_JAR_BASE_NAME:*.jar=%"
-SET "MVNW_WRAPPER_JAR_BASE_NAME=%MVNW_WRAPPER_JAR_BASE_NAME:*-=%"
-SET "MVNW_WRAPPER_JAR_BASE_NAME=maven-wrapper"
-
-SET "MVNW_WRAPPER_JAR_DIR=%MAVEN_PROJECT_DIR%/.mvn/wrapper"
-SET "MVNW_WRAPPER_JAR=%MVNW_WRAPPER_JAR_DIR%/%MVNW_WRAPPER_JAR_BASE_NAME%.jar"
-SET "MVNW_DOWNLOAD_URL=%MVNW_WRAPPER_URL%"
-
-IF "%MVNW_VERBOSE%" == "true" (
-  ECHO MVNW_WRAPPER_URL: %MVNW_WRAPPER_URL%
-  ECHO MVNW_WRAPPER_JAR: %MVNW_WRAPPER_JAR%
-  ECHO MVNW_DOWNLOAD_URL: %MVNW_DOWNLOAD_URL%
-)
-
-IF NOT EXIST "%MVNW_WRAPPER_JAR%" (
-    ECHO Downloading %MVNW_DOWNLOAD_URL%
-    powershell.exe -Command "& { [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; $webClient = New-Object System.Net.WebClient; $webClient.DownloadFile('%MVNW_DOWNLOAD_URL%', '%MVNW_WRAPPER_JAR%') }"
-    IF ERRORLEVEL 1 (
-        ECHO Failed to download %MVNW_DOWNLOAD_URL%
-        GOTO :eof_error
+    powershell -Command "&{"^
+		"$webclient = new-object System.Net.WebClient;"^
+		"if (-not ([string]::IsNullOrEmpty('%MVNW_USERNAME%') -and [string]::IsNullOrEmpty('%MVNW_PASSWORD%'))) {"^
+		"$webclient.Credentials = new-object System.Net.NetworkCredential('%MVNW_USERNAME%', '%MVNW_PASSWORD%');"^
+		"}"^
+		"[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; $webclient.DownloadFile('%DOWNLOAD_URL%', '%WRAPPER_JAR%')"^
+		"}"
+    if "%MVNW_VERBOSE%" == "true" (
+        echo Finished downloading %WRAPPER_JAR%
     )
 )
+@REM End of extension
 
-SET "MAVEN_CMD_LINE_ARGS=%*"
+@REM Provide a "standardized" way to retrieve the CLI args that will
+@REM work with both Windows and non-Windows executions.
+set MAVEN_CMD_LINE_ARGS=%*
 
-@REM The following complex command consumes the command line arguments and determines the location of the Java home
-@REM directory. The algorithm is as follows:
-@REM
-@REM 1. Scan the command line arguments for the --java-home argument. The value of this argument is returned.
-@REM 2. If the --java-home argument is not found, scan the command line arguments for the --java-version argument.
-@REM    The value of this argument is used to look up a toolchain. If a toolchain is found, its path is returned.
-@REM 3. If neither of the above arguments are found, the value of the JAVA_HOME environment variable is returned.
-@REM 4. If the JAVA_HOME environment variable is not set, the java executable is resolved from the PATH. The parent
-@REM    of the parent of the executable is returned.
-@REM
-@REM The location is ultimately stored in the JAVA_HOME environment variable.
+%MAVEN_JAVA_EXE% %JVM_CONFIG_MAVEN_PROPS% %MAVEN_OPTS% %MAVEN_DEBUG_OPTS% -classpath %WRAPPER_JAR% "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %WRAPPER_LAUNCHER% %MAVEN_CONFIG% %*
+if ERRORLEVEL 1 goto error
+goto end
 
-FOR /f "tokens=* usebackq" %%a IN (`"%JAVA_HOME%/bin/java.exe" -Xmx32m -Dfile.encoding=UTF-8 -cp "%MVNW_WRAPPER_JAR%" "org.springframework.boot.maven.wrapper.MavenWrapperExecutor" %MAVEN_CMD_LINE_ARGS%`) DO (
-  SET "MAVEN_JAVA_EXE=%%a"
-)
+:error
+set ERROR_CODE=1
 
-IF NOT DEFINED MAVEN_JAVA_EXE (
-  FOR /f "tokens=* usebackq" %%a IN (`"%JAVA_HOME%/bin/java" -Xmx32m -Dfile.encoding=UTF-8 -cp "%MVNW_WRAPPER_JAR%" "org.springframework.boot.maven.wrapper.MavenWrapperExecutor" %MAVEN_CMD_LINE_ARGS%`) DO (
-    SET "MAVEN_JAVA_EXE=%%a"
-  )
-)
+:end
+@endlocal & set ERROR_CODE=%ERROR_CODE%
 
-IF NOT DEFINED MAVEN_JAVA_EXE (
-  FOR /f "tokens=* usebackq" %%a IN (`java -Xmx32m -Dfile.encoding=UTF-8 -cp "%MVNW_WRAPPER_JAR%" "org.springframework.boot.maven.wrapper.MavenWrapperExecutor" %MAVEN_CMD_LINE_ARGS%`) DO (
-    SET "MAVEN_JAVA_EXE=%%a"
-  )
-)
+if not "%MAVEN_SKIP_RC%" == "" goto skipRcPost
+@REM check for post script, once with legacy .bat ending and once with .cmd ending
+if exist "%HOME%\mavenrc_post.bat" call "%HOME%\mavenrc_post.bat"
+if exist "%HOME%\mavenrc_post.cmd" call "%HOME%\mavenrc_post.cmd"
+:skipRcPost
 
-IF NOT DEFINED MAVEN_JAVA_EXE (
-  ECHO The JAVA_HOME environment variable is not defined correctly.
-  ECHO It must point to a JDK installation.
-  GOTO :eof_error
-)
+@REM pause the script if MAVEN_BATCH_PAUSE is set to 'on'
+if "%MAVEN_BATCH_PAUSE%" == "on" pause
 
-"%MAVEN_JAVA_EXE%" %MAVEN_OPTS% -cp "%MVNW_WRAPPER_JAR%" "org.apache.maven.wrapper.MavenWrapper" %MAVEN_CMD_LINE_ARGS%
+if "%MAVEN_TERMINATE_CMD%" == "on" exit %ERROR_CODE%
 
-SET "MVNW_ERRORLEVEL=%ERRORLEVEL%"
-GOTO :eof
-
-:eof_error
-SET "MVNW_ERRORLEVEL=1"
-
-:eof
-EXIT /B %MVNW_ERRORLEVEL%
-@GOTO :EOF
+exit /B %ERROR_CODE%
