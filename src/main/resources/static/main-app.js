@@ -95,3 +95,23 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Não foi possível determinar o sistema ou cargo do usuário.");
     }
 });
+
+const sistema = localStorage.getItem('sistemaSelecionado') || localStorage.getItem('userSystem');
+const logoElement = document.getElementById('logo-sistema');
+
+    if (logoElement) {
+        switch (sistema) {
+            case 'BIOMEDICINA':
+                logoElement.src = '/img/icones-pequenos-topo-bio.jpg';
+                break;
+            case 'ODONTOLOGIA':
+                logoElement.src = '/img/icones-peq-topo-odonto.png';
+                break;
+            case 'NUTRICAO':
+                logoElement.src = '/img/logo-nutricao.jpg';
+                break;
+            // etc...
+            default:
+                logoElement.src = '/img/logo-padrao.jpg';
+        }
+    }

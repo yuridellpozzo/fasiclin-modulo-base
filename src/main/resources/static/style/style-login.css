@@ -16,7 +16,7 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('/img/logo-tela-inicial.png'); /* Substitua pelo caminho correto da sua imagem */
+    background-image: url('/img/painel-inicial.avif'); /* Substitua pelo caminho correto da sua imagem */
     background-size: cover; /* A imagem cobrirá toda a área, cortando se necessário */
     background-position: center center; /* Centraliza a imagem */
     background-repeat: no-repeat; /* Evita repetição */
@@ -37,7 +37,7 @@ body::before {
 /* =================================================================== */
 .card.bg-secondary {
     /* Usamos RGBA para definir a cor preta (#000000) com 80% de opacidade (0.8) */
-    background-color: rgba(0, 0, 0, 0.8) !important; 
+    background-color: #000000b0 !important; 
     border: none;
     /* Adicione um padding um pouco maior para espaçar bem o conteúdo */
     padding: 2rem !important; 
