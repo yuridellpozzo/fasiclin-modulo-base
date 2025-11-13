@@ -8,7 +8,6 @@ import com.br.fasipe.menubase.biomedicina.dto.LoginResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Optional;
-import java.util.Set;
 import org.springframework.web.bind.annotation.CrossOrigin; 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
