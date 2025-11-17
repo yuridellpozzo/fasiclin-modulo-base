@@ -18,56 +18,105 @@ public class MenuController {
 
     @GetMapping("/menu")
     public ResponseEntity<List<MenuItemDTO>> getMenu(
-            @RequestParam String sistema, 
-            @RequestParam String cargo) {
+            @RequestParam String sistema,  // Ex: "ODONTOLOGIA"
+            @RequestParam String tipoProfi // Ex: "2", "3", "4"
+            ) {
         
         List<MenuItemDTO> menu = new ArrayList<>();
 
-        // Lógica para carregar o menu baseado no sistema
-        switch (sistema.toUpperCase()) {
-            case "BIOMEDICINA":
-                menu.add(new MenuItemDTO("ANAMNESE", "#"));
-                menu.add(new MenuItemDTO("CAD. DADOS PACIENTE", "#"));
-                menu.add(new MenuItemDTO("CAD. PEDIDOS E PRESCRIÇÃO", "#"));
-                menu.add(new MenuItemDTO("CAD. RESULTADOS", "#"));
-                menu.add(new MenuItemDTO("COLETA DE ASSINATURAS", "#"));
-                menu.add(new MenuItemDTO("EMISSÃO DE LAUDO", "#"));
-                menu.add(new MenuItemDTO("IMPRESSÃO DE LAUDOS", "#"));
-                menu.add(new MenuItemDTO("REGISTRO DE PRONTUÁRIO", "#"));
-                menu.add(new MenuItemDTO("REGISTROS", "#"));
-                menu.add(new MenuItemDTO("RELATÓRIO DE PRODUÇÃO", "#"));
-                break;
+        // Padroniza para evitar erros de maiúsculas/minúsculas
+        String sistemaUpper = sistema.toUpperCase();
+        
+        // --- LÓGICA ESPECÍFICA POR SISTEMA ---
+        switch (sistemaUpper) {
             
+            // =================================================================
+            // ODONTOLOGIA
+            // =================================================================
             case "ODONTOLOGIA":
-                menu.add(new MenuItemDTO("CAD. DADOS PACIENTE", "#"));
-                menu.add(new MenuItemDTO("CONFIGURAÇÕES", "#"));
-                menu.add(new MenuItemDTO("PRESCRIÇÃO DE MEDICAMENTOS", "#"));
-                menu.add(new MenuItemDTO("CAD. PRESCRIÇÃO DO PACIENTE", "#"));
-                menu.add(new MenuItemDTO("HOMOLOGAÇÃO ODONTO", "#"));
-                menu.add(new MenuItemDTO("CAD. TRATAMENTO", "#"));
+                // CAD. PRESCRIÇÃO DO PACIENTE (Tipo 2)
+                if (checkPermissao(tipoProfi, "2")) {
+                    menu.add(new MenuItemDTO("CAD. PRESCRIÇÃO DO PACIENTE", "#"));
+                }
+                // PRESCRIÇÃO DE MEDICAMENTOS (Tipo 2)
+                if (checkPermissao(tipoProfi, "2")) {
+                    menu.add(new MenuItemDTO("PRESCRIÇÃO DE MEDICAMENTOS", "#"));
+                }
+                // ACOMP. EVOLUÇÃO PACIENTE (Tipo 2 ou 3)
+                if (checkPermissao(tipoProfi, "2", "3")) {
+                    menu.add(new MenuItemDTO("ACOMP. EVOLUÇÃO PACIENTE", "#"));
+                }
+                // HOMOLOGAÇÃO ODONTO (Tipo 3)
+                if (checkPermissao(tipoProfi, "3")) {
+                    menu.add(new MenuItemDTO("HOMOLOGAÇÃO ODONTO", "#"));
+                }
+                // CAD. TRATAMENTO (Tipo 4 - Master)
+                if (checkPermissao(tipoProfi, "4")) {
+                    menu.add(new MenuItemDTO("CAD. TRATAMENTO", "#"));
+                }
                 break;
 
-            case "CORINGA": // Módulos Coringa que você listou
-                menu.add(new MenuItemDTO("CAD. ANAMNESE", "#"));
-                menu.add(new MenuItemDTO("REGISTRO DE DOCS. / MÍDIA", "#"));
-                menu.add(new MenuItemDTO("REGISTRO DE PRONTUÁRIO", "#"));
-                menu.add(new MenuItemDTO("CAD. DADOS PACIENTE", "#"));
+            // =================================================================
+            // BIOMEDICINA
+            // =================================================================
+            case "BIOMEDICINA":
+                // IMPRESSÃO DE LAUDOS (Tipo 3)
+                if (checkPermissao(tipoProfi, "3")) {
+                    menu.add(new MenuItemDTO("IMPRESSÃO DE LAUDOS", "#"));
+                }
+                // EMISSÃO DE LAUDO (Tipo 3)
+                if (checkPermissao(tipoProfi, "3")) {
+                    menu.add(new MenuItemDTO("EMISSÃO DE LAUDO", "#"));
+                }
+                // RELATÓRIO DE PRODUÇÃO (Tipo 2)
+                if (checkPermissao(tipoProfi, "2")) {
+                    menu.add(new MenuItemDTO("RELATÓRIO DE PRODUÇÃO", "#"));
+                }
+                // CADASTRO DE RESULTADOS (Tipo 2)
+                if (checkPermissao(tipoProfi, "2")) {
+                    menu.add(new MenuItemDTO("CADASTRO DE RESULTADOS", "#"));
+                }
+                // CAD. PEDIDOS E PRESCRIÇÃO (Tipo 2 ou 3)
+                if (checkPermissao(tipoProfi, "2", "3")) {
+                    menu.add(new MenuItemDTO("CAD. PEDIDOS E PRESCRIÇÃO", "#"));
+                }
+                // COLETA DE ASSINATURAS (Tipo 2 ou 3)
+                if (checkPermissao(tipoProfi, "2", "3")) {
+                    menu.add(new MenuItemDTO("COLETA DE ASSINATURAS", "#"));
+                }
                 break;
-            
-            // Adicione 'case' para "NUTRICAO", "PSICOLOGIA", etc.
-            
+
+            // =================================================================
+            // SISTEMA NÃO ENCONTRADO
+            // =================================================================
             default:
-                menu.add(new MenuItemDTO("Módulo não encontrado", "#"));
+                menu.add(new MenuItemDTO("Módulo não configurado: " + sistemaUpper, "#"));
         }
 
-        // Lógica de permissão baseada no Cargo
-        // Se for Supervisor ou Admin, adiciona botões especiais
-        if (cargo.equals("Supervisor") || cargo.equals("Administrador")) {
-            menu.add(new MenuItemDTO("--- GESTÃO ---", "#")); // Um divisor
-            menu.add(new MenuItemDTO("RELATÓRIOS DO MÓDULO", "#"));
-            menu.add(new MenuItemDTO("PAINEL DO SUPERVISOR", "#"));
+        // --- ITENS COMUNS PARA TODOS (EXCETO TIPO 1 QUE TEM TELA PRÓPRIA) ---
+        // (Se desejar adicionar itens comuns como "Meus Dados", coloque aqui)
+
+
+        // --- LÓGICA DO MASTER (TIPO 4) - CONFIGURAÇÕES ---
+        // O Master sempre vê o botão de configurações no final
+        if (tipoProfi.equals("4")) {
+            menu.add(new MenuItemDTO("--- ADMINISTRAÇÃO ---", "#"));
+            menu.add(new MenuItemDTO("CONFIGURAÇÕES DO MÓDULO", "/pages/configuracoes.html"));
         }
 
         return ResponseEntity.ok(menu);
+    }
+
+    // Método auxiliar para verificar se o tipoProfi está na lista de permitidos
+    private boolean checkPermissao(String usuarioTipo, String... tiposPermitidos) {
+        // O Master (4) geralmente vê tudo? Se sim, descomente a linha abaixo:
+        // if (usuarioTipo.equals("4")) return true; 
+        
+        for (String tipo : tiposPermitidos) {
+            if (usuarioTipo.equals(tipo)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

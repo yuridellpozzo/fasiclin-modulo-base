@@ -1,0 +1,12 @@
+{
+  "BIOMEDICINA": {
+    "logoUrl": "/img/logo-biomedicina.jpg",
+    "corPrimaria": "#007bff",
+    "corBotao": "#0056b3"
+  },
+  "ODONTOLOGIA": {
+    "logoUrl": "/img/logo-odontologia.jpg",
+    "corPrimaria": "#0d6efd",
+    "corBotao": "#0a58ca"
+  }
+}
