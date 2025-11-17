@@ -18,13 +18,15 @@ public class Profissional implements Serializable {
     @Column(name = "ID_SUPPROFI")
     private Integer idSupprofi;
 
+    // --- MUDANÇA AQUI (Passo 1): Mapeando a coluna TIPOPROFI ---
+    @Column(name = "TIPOPROFI")
+    private String tipoProfi; // '1', '2', '3', ou '4'
+    // --- FIM DA MUDANÇA ---
+
     @OneToOne
     @JoinColumn(name = "ID_PESSOAFIS")
     private PessoaFis pessoaFis;
 
-    // --- MUDANÇA AQUI ---
-    // Mapeia a tabela PROFI_ESPEC
-    // Carrega as especialidades do profissional
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "PROFI_ESPEC",
@@ -32,34 +34,23 @@ public class Profissional implements Serializable {
         inverseJoinColumns = @JoinColumn(name = "ID_ESPEC")
     )
     private Set<Especialidade> especialidades = new HashSet<>();
-    
-    // --- FIM DA MUDANÇA ---
 
     // Getters e Setters
-    public Integer getIdprofissio() {
-        return idprofissio;
-    }
-    public void setIdprofissio(Integer idprofissio) {
-        this.idprofissio = idprofissio;
-    }
-    public Integer getIdSupprofi() {
-        return idSupprofi;
-    }
-    public void setIdSupprofi(Integer idSupprofi) {
-        this.idSupprofi = idSupprofi;
-    }
-    public PessoaFis getPessoaFis() {
-        return pessoaFis;
-    }
-    public void setPessoaFis(PessoaFis pessoaFis) {
-        this.pessoaFis = pessoaFis;
-    }
 
-    // Getter para as novas especialidades
-    public Set<Especialidade> getEspecialidades() {
-        return especialidades;
-    }
-    public void setEspecialidades(Set<Especialidade> especialidades) {
-        this.especialidades = especialidades;
-    }
+    // --- MUDANÇA AQUI: Getters e Setters para tipoProfi ---
+    public String getTipoProfi() { return tipoProfi; }
+    public void setTipoProfi(String tipoProfi) { this.tipoProfi = tipoProfi; }
+    // --- FIM DA MUDANÇA ---
+
+    public Integer getIdprofissio() {return idprofissio;}
+    public void setIdprofissio(Integer idprofissio) { this.idprofissio = idprofissio; }
+    
+    public Integer getIdSupprofi() { return idSupprofi; }
+    public void setIdSupprofi(Integer idSupprofi) { this.idSupprofi = idSupprofi; }
+    
+    public PessoaFis getPessoaFis() { return pessoaFis; }
+    public void setPessoaFis(PessoaFis pessoaFis) { this.pessoaFis = pessoaFis; }
+
+    public Set<Especialidade> getEspecialidades() { return especialidades; }
+    public void setEspecialidades(Set<Especialidade> especialidades) { this.especialidades = especialidades; }
 }

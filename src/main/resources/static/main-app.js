@@ -1,30 +1,37 @@
-// --- FUNÇÃO 1: CARREGAR O MENU DINÂMICO ---
-async function loadDynamicMenu(sistema, cargo) {
+// --- FUNÇÃO 1: CARREGAR O MENU DINÂMICO (CORRIGIDA) ---
+// Agora aceita 'tipoProfi' (ex: "4") em vez de 'cargo' (ex: "Master")
+async function loadDynamicMenu(sistema, tipoProfi) {
     const menuContainer = document.getElementById('menu-container');
-    if (!menuContainer) return; // Sai se o contêiner não existir
+    if (!menuContainer) return; 
 
     try {
-        // 1. Busca no back-end o menu correto
-        const response = await fetch(`http://localhost:8080/api/menu?sistema=${sistema}&cargo=${cargo}`);
+        // --- MUDANÇA CRÍTICA AQUI ---
+        // O endpoint agora espera 'tipoProfi', não 'cargo'
+        const response = await fetch(`http://localhost:8080/api/menu?sistema=${sistema}&tipoProfi=${tipoProfi}`);
         
         if (!response.ok) {
-            throw new Error("Não foi possível carregar o menu.");
+            throw new Error("Não foi possível carregar o menu. Status: " + response.status);
         }
 
         const menuItems = await response.json();
+
+        // Limpa o container antes de adicionar (para evitar duplicatas)
+        menuContainer.innerHTML = '';
 
         // 2. Constrói os botões
         menuItems.forEach(item => {
             const newButton = document.createElement('a');
             newButton.href = item.url;
-            newButton.className = 'btn btn-success text-start'; // Usa o estilo dos seus botões antigos
+            newButton.className = 'btn btn-success text-start'; 
             newButton.role = 'button';
             newButton.textContent = item.nome;
             
-            // Adiciona botões especiais (como o divisor) com um estilo diferente
+            // Estilo especial para divisores
             if (item.nome.startsWith('---')) {
                 newButton.className = 'text-white text-uppercase small disabled mt-2';
-                newButton.textContent = item.nome.replace('---', ''); // Remove os traços
+                newButton.textContent = item.nome.replace('---', ''); 
+                // Remove o href para divisores
+                newButton.removeAttribute('href');
             }
             
             menuContainer.appendChild(newButton);
@@ -32,7 +39,7 @@ async function loadDynamicMenu(sistema, cargo) {
 
     } catch (error) {
         console.error("Erro ao carregar menu:", error);
-        menuContainer.innerHTML += '<span class="text-danger">Erro ao carregar o menu.</span>';
+        menuContainer.innerHTML = '<span class="text-danger">Erro ao carregar o menu.</span>';
     }
 }
 
@@ -52,9 +59,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnVoltar = document.getElementById('btn-voltar-selecao');
     const adminDivider = document.getElementById('admin-divider');
 
-    if (isAdmin === 'true' && btnVoltar) {
+    // Se for Admin Geral OU Master (Tipo 4), mostramos o botão de voltar
+    const tipoProfi = localStorage.getItem('tipoProfi');
+    
+    if ((isAdmin === 'true' || tipoProfi === '4') && btnVoltar) {
         btnVoltar.style.display = 'block';
-        adminDivider.style.display = 'block';
+        if(adminDivider) adminDivider.style.display = 'block';
+        
         btnVoltar.addEventListener('click', (e) => {
             e.preventDefault(); 
             window.location.href = '/pages/selecao-sistema.html';
@@ -82,36 +93,63 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 5. CARREGAR O MENU (A GRANDE MUDANÇA) ---
+    // --- 5. CARREGAR O MENU (CORRIGIDO) ---
     
-    // Decide qual sistema deve ser carregado
-    // Se o Admin escolheu um, usa esse. Senão, usa o do próprio usuário.
-    const sistemaParaCarregar = localStorage.getItem('sistemaSelecionado') || localStorage.getItem('userSystem');
-    const cargoDoUsuario = localStorage.getItem('userRole');
+    // Tenta pegar do Admin/Master (seleção) OU do usuário comum (login)
+    let sistemaParaCarregar = localStorage.getItem('sistemaSelecionado');
+    
+    // Se não houver seleção (Tipos 2 e 3), pega do login
+    if (!sistemaParaCarregar) {
+        sistemaParaCarregar = localStorage.getItem('userSystem');
+    }
 
-    if (sistemaParaCarregar && cargoDoUsuario) {
-        loadDynamicMenu(sistemaParaCarregar, cargoDoUsuario);
+    console.log("Sistema:", sistemaParaCarregar); 
+    console.log("Tipo Profi:", tipoProfi);       
+
+    // Verifica se temos o sistema E o tipoProfi
+    if (sistemaParaCarregar && tipoProfi) {
+        
+        // --- MUDANÇA CRÍTICA AQUI ---
+        // Chama a função passando 'tipoProfi' em vez de 'userRole'
+        loadDynamicMenu(sistemaParaCarregar, tipoProfi);
+        
+        // Carrega a Logo
+        carregarLogo(sistemaParaCarregar);
+
     } else {
-        console.error("Não foi possível determinar o sistema ou cargo do usuário.");
+        console.error("Dados insuficientes. Sistema ou Tipo Profissional faltando.");
+        console.error("Sistema:", sistemaParaCarregar, "Tipo:", tipoProfi);
     }
 });
 
-const sistema = localStorage.getItem('sistemaSelecionado') || localStorage.getItem('userSystem');
-const logoElement = document.getElementById('logo-sistema');
-
-    if (logoElement) {
-        switch (sistema) {
+// Função separada para carregar a logo
+function carregarLogo(sistema) {
+    const logoElement = document.getElementById('logo-sistema');
+    if (logoElement && sistema) {
+        // Normaliza para maiúsculas para evitar erros de case
+        const sys = sistema.toUpperCase();
+        
+        switch (sys) {
             case 'BIOMEDICINA':
                 logoElement.src = '/img/icones-pequenos-topo-bio.jpg';
                 break;
             case 'ODONTOLOGIA':
-                logoElement.src = '/img/icones-peq-topo-odonto.png';
+                // Certifique-se que este arquivo existe na pasta /img/
+                logoElement.src = '/img/icones-peq-topo-odonto.png'; 
                 break;
             case 'NUTRICAO':
                 logoElement.src = '/img/logo-nutricao.jpg';
                 break;
-            // etc...
+            case 'PSICOLOGIA':
+                logoElement.src = '/img/logo-psicologia.jpg';
+                break;
+            case 'FISIOTERAPIA':
+                logoElement.src = '/img/logo-fisioterapia.jpg';
+                break;
             default:
-                logoElement.src = '/img/logo-padrao.jpg';
+                // Se não achar, usa uma logo padrão ou a de Biomedicina como fallback
+                logoElement.src = '/img/icones-pequenos-topo-bio.jpg'; 
+                console.warn("Logo não definida para o sistema:", sys);
         }
     }
+}

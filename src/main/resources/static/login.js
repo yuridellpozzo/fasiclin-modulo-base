@@ -1,33 +1,22 @@
 document.addEventListener("DOMContentLoaded", () => {
     
-    // 1. Pega os elementos pelos IDs corretos do seu HTML
     const loginForm = document.getElementById("login-form");
     const usernameInput = document.getElementById("inputUsuario"); 
     const passwordInput = document.getElementById("inputSenha"); 
     const errorMessage = document.getElementById("error-message");
 
-    // Verifica se o formulário existe na página
     if (loginForm) {
-        
         loginForm.addEventListener("submit", (event) => {
-            
-            // Impede o formulário de recarregar a página
             event.preventDefault(); 
 
-            // 2. Pega os valores dos seus inputs
-            const username = usernameInput.value;
-            const password = passwordInput.value;
-
-            // 3. Cria o objeto JSON com os nomes que o BACK-END (Java) espera
             const loginData = {
-                login: username, 
-                senha: password 
+                login: usernameInput.value, 
+                senha: passwordInput.value 
             };
 
-            // Limpa mensagens de erro antigas
             errorMessage.textContent = "";
 
-            // 4. O Fetch aponta para a URL ABSOLUTA
+            // Fetch para a API
             fetch("http://localhost:8080/api/auth/login", { 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -35,38 +24,41 @@ document.addEventListener("DOMContentLoaded", () => {
             })
             .then(response => {
                 if (response.ok) {
-                    return response.json(); // Converte a resposta em JSON
+                    return response.json();
                 } else {
-                    throw new Error('Falha no login'); // Causa o .catch()
+                    throw new Error('Falha no login');
                 }
             })
             .then(data => {
-                // Se chegou aqui, o login foi sucesso e 'data' é o JSON
-                console.log("Login bem-sucedido:", data);
+                console.log("Login sucesso:", data);
                 
-                // --- MUDANÇA APLICADA (Passo 2) ---
+                // --- MUDANÇA AQUI (Passo 2): Salvar novos dados e Roteamento ---
                 
-                // 1. Salva TODOS os dados do usuário no localStorage
                 localStorage.setItem('userIsLoggedIn', 'true');
                 localStorage.setItem('userName', data.nome);
                 localStorage.setItem('userRole', data.cargo);
-                localStorage.setItem('userSystem', data.sistema);
-                localStorage.setItem('isSystemAdmin', data.isSystemAdmin);
+                localStorage.setItem('tipoProfi', data.tipoProfi);
+                // Salva as especialidades como String JSON para usar depois
+                localStorage.setItem('userEspecialidades', JSON.stringify(data.especialidades));
 
-                // 2. Aplica a regra de redirecionamento
-                if (data.isSystemAdmin) {
-                    // Se for Admin (ID=1), vai para a tela de seleção
+                // Lógica de Redirecionamento (Conforme seu Prompt)
+                if (data.tipoProfi === '1') {
+                    // TIPO 1 = ADMINISTRADOR -> Vai para tela Administrativa (Coringa)
+                    // Obs: Precisamos criar 'admin-coringa.html' depois
+                    window.location.href = "/pages/admin-coringa.html"; 
+
+                } else if (data.tipoProfi === '4') {
+                    // TIPO 4 = MASTER -> Vai para tela de Seleção de Módulo
                     window.location.href = "/pages/selecao-sistema.html"; 
+
                 } else {
-                    // Se for Profissional ou Supervisor, vai para a tela principal
+                    // TIPO 2 (Profissional) e 3 (Supervisor) -> Vai direto para o Módulo
                     window.location.href = "/pages/tela-principal.html"; 
                 }
                 // --- FIM DA MUDANÇA ---
             })
             .catch(error => {
-                // Se response.ok foi false OU a rede falhou
-                console.error("Erro na requisição:", error);
-                
+                console.error("Erro:", error);
                 if (error.message.includes('Failed to fetch')) {
                     errorMessage.textContent = "Não foi possível conectar ao servidor.";
                 } else {
