@@ -1,10 +1,11 @@
 package com.br.fasipe.menubase.biomedicina.controllers;
 
+import com.br.fasipe.menubase.biomedicina.models.Especialidade;
 import com.br.fasipe.menubase.biomedicina.models.Profissional;
 import com.br.fasipe.menubase.biomedicina.models.Usuario;
 import com.br.fasipe.menubase.biomedicina.repository.UsuarioRepository;
 import com.br.fasipe.menubase.biomedicina.dto.LoginResponse;
-import com.br.fasipe.menubase.biomedicina.dto.EspecialidadeDTO; // Importe o novo DTO
+import com.br.fasipe.menubase.biomedicina.dto.EspecialidadeDTO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Optional;
@@ -46,6 +47,7 @@ public class UserLoginController {
         String cargo = "Indefinido";
         String tipoProfi = "0";
         boolean isSystemAdmin = false;
+        String sistemaPrincipal = "INDEFINIDO"; // Variável nova para resolver o erro do Supervisor
         List<EspecialidadeDTO> especialidadesDTO = List.of();
 
         // 1. OBTER NOME
@@ -59,31 +61,41 @@ public class UserLoginController {
              System.err.println("Erro ao buscar nome: " + e.getMessage());
         }
 
-        // 2. LÓGICA BASEADA EM TIPOPROFI (Passo 1 - Refatorado)
+        // 2. LÓGICA BASEADA EM TIPOPROFI
         if (profissional != null) {
-            tipoProfi = profissional.getTipoProfi(); // Pega o '1', '2', '3' ou '4'
+            tipoProfi = profissional.getTipoProfi(); 
             
             // Converter especialidades para DTO
             especialidadesDTO = profissional.getEspecialidades().stream()
                 .map(e -> new EspecialidadeDTO(e.getIdespec(), e.getDescespec()))
                 .collect(Collectors.toList());
 
-            // Define Cargo e Permissões com base no TIPOPROFI
+            // --- CORREÇÃO PARA O SUPERVISOR (E PROFISSIONAL) ---
+            // Tenta encontrar o nome do sistema (ex: "BIOMEDICINA") na lista de especialidades
+            Optional<Especialidade> especEncontrada = profissional.getEspecialidades().stream()
+                .filter(e -> e.getIdespec() != 10) // Ignora "Administrador" (ID 10)
+                .findFirst();
+
+            if (especEncontrada.isPresent()) {
+                sistemaPrincipal = especEncontrada.get().getDescespec().toUpperCase();
+            }
+            // ---------------------------------------------------
+
             if (tipoProfi != null) {
                 switch (tipoProfi) {
-                    case "1": // ADMINISTRADOR (Coringa)
+                    case "1": 
                         cargo = "Administrador";
                         isSystemAdmin = true; 
+                        sistemaPrincipal = "CORINGA"; // Admin sempre cai no Coringa
                         break;
-                    case "2": // PROFISSIONAL
+                    case "2": 
                         cargo = "Profissional";
                         break;
-                    case "3": // SUPERVISOR
+                    case "3": 
                         cargo = "Supervisor";
                         break;
-                    case "4": // MASTER (Super Admin do Módulo)
+                    case "4": 
                         cargo = "Master";
-                        // Master não é admin global, mas tem poderes no módulo
                         break;
                     default:
                         cargo = "Profissional";
@@ -91,8 +103,8 @@ public class UserLoginController {
             }
         }
         
-        // Cria e retorna o objeto de resposta com os novos dados
-        LoginResponse response = new LoginResponse(nome, cargo, isSystemAdmin, tipoProfi, especialidadesDTO);
+        // Agora passamos o 'sistemaPrincipal' corretamente para o DTO
+        LoginResponse response = new LoginResponse(nome, cargo, isSystemAdmin, sistemaPrincipal, tipoProfi, especialidadesDTO);
         return ResponseEntity.ok(response);
     }
 }
