@@ -18,14 +18,14 @@ public class Profissional implements Serializable {
     @Column(name = "ID_SUPPROFI")
     private Integer idSupprofi;
 
-    // --- MUDANÇA AQUI (Passo 1): Mapeando a coluna TIPOPROFI ---
     @Column(name = "TIPOPROFI")
-    private String tipoProfi; // '1', '2', '3', ou '4'
-    // --- FIM DA MUDANÇA ---
+    private String tipoProfi;
 
-    @OneToOne
-    @JoinColumn(name = "ID_PESSOAFIS")
-    private PessoaFis pessoaFis;
+    // --- ATUALIZAÇÃO DB ---
+    // ID_PESSOAFIS removido.
+    // IDDOCUMENTO adicionado.
+    @Column(name = "IDDOCUMENTO")
+    private String idDocumento;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -36,20 +36,16 @@ public class Profissional implements Serializable {
     private Set<Especialidade> especialidades = new HashSet<>();
 
     // Getters e Setters
-
-    // --- MUDANÇA AQUI: Getters e Setters para tipoProfi ---
     public String getTipoProfi() { return tipoProfi; }
     public void setTipoProfi(String tipoProfi) { this.tipoProfi = tipoProfi; }
-    // --- FIM DA MUDANÇA ---
-
     public Integer getIdprofissio() {return idprofissio;}
     public void setIdprofissio(Integer idprofissio) { this.idprofissio = idprofissio; }
-    
     public Integer getIdSupprofi() { return idSupprofi; }
     public void setIdSupprofi(Integer idSupprofi) { this.idSupprofi = idSupprofi; }
     
-    public PessoaFis getPessoaFis() { return pessoaFis; }
-    public void setPessoaFis(PessoaFis pessoaFis) { this.pessoaFis = pessoaFis; }
+    // Novo Getter/Setter
+    public String getIdDocumento() { return idDocumento; }
+    public void setIdDocumento(String idDocumento) { this.idDocumento = idDocumento; }
 
     public Set<Especialidade> getEspecialidades() { return especialidades; }
     public void setEspecialidades(Set<Especialidade> especialidades) { this.especialidades = especialidades; }

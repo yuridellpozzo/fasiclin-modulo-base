@@ -1,0 +1,12 @@
+{
+  "BIOMEDICINA" : {
+    "sistema" : "BIOMEDICINA",
+    "logoBase64" : null,
+    "colorPrimary" : "#cc1414",
+    "colorSecondary" : "#08110d",
+    "colorText" : "#f1efef",
+    "fontFamily" : "'Times New Roman', serif",
+    "fontSize" : "20px",
+    "language" : "es"
+  }
+}

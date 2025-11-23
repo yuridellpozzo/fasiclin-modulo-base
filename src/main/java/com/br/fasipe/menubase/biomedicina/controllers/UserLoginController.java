@@ -42,51 +42,80 @@ public class UserLoginController {
         Usuario usuario = usuarioOpcional.get();
         Profissional profissional = usuario.getProfissional();
 
-        // --- VARIÁVEIS PADRÃO ---
-        String nome = "Usuário";
+        // --- 1. BUSCA DO NOME REAL (PELA TABELA PESSOA) ---
+        String nome = usuario.getLogin().toUpperCase(); // Fallback: Login
+        String docBusca = null;
+
+        if (usuario.getIdDocumento() != null) {
+            docBusca = String.valueOf(usuario.getIdDocumento());
+        } else if (profissional != null && profissional.getIdDocumento() != null) {
+            docBusca = String.valueOf(profissional.getIdDocumento());
+        }
+
+        if (docBusca != null) {
+            try {
+                String nomeBanco = usuarioRepository.findNomeByDocumento(docBusca);
+                if (nomeBanco != null && !nomeBanco.isEmpty()) {
+                    nome = nomeBanco;
+                }
+            } catch (Exception e) {
+                System.out.println("Erro ao buscar nome: " + e.getMessage());
+            }
+        }
+
+        // --- 2. VARIÁVEIS PADRÃO ---
         String cargo = "Indefinido";
         String tipoProfi = "0";
         boolean isSystemAdmin = false;
-        String sistemaPrincipal = "INDEFINIDO"; // Variável nova para resolver o erro do Supervisor
+        String sistemaPrincipal = "INDEFINIDO"; 
         List<EspecialidadeDTO> especialidadesDTO = List.of();
 
-        // 1. OBTER NOME
-        try {
-            if (profissional != null && profissional.getPessoaFis() != null) {
-                nome = profissional.getPessoaFis().getNomepessoa();
-            } else if (usuario.getPessoaFis() != null) {
-                nome = usuario.getPessoaFis().getNomepessoa();
-            }
-        } catch (Exception e) {
-             System.err.println("Erro ao buscar nome: " + e.getMessage());
-        }
-
-        // 2. LÓGICA BASEADA EM TIPOPROFI
+        // --- 3. LÓGICA INTELIGENTE (IDS CORRIGIDOS) ---
         if (profissional != null) {
             tipoProfi = profissional.getTipoProfi(); 
             
-            // Converter especialidades para DTO
-            especialidadesDTO = profissional.getEspecialidades().stream()
-                .map(e -> new EspecialidadeDTO(e.getIdespec(), e.getDescespec()))
-                .collect(Collectors.toList());
+            if (profissional.getEspecialidades() != null) {
+                // Converte para DTO para enviar ao front-end
+                especialidadesDTO = profissional.getEspecialidades().stream()
+                    .map(e -> new EspecialidadeDTO(e.getIdespec(), e.getDescespec()))
+                    .collect(Collectors.toList());
 
-            // --- CORREÇÃO PARA O SUPERVISOR (E PROFISSIONAL) ---
-            // Tenta encontrar o nome do sistema (ex: "BIOMEDICINA") na lista de especialidades
-            Optional<Especialidade> especEncontrada = profissional.getEspecialidades().stream()
-                .filter(e -> e.getIdespec() != 10) // Ignora "Administrador" (ID 10)
-                .findFirst();
+                System.out.println("Usuario: " + nome + " | Analisando IDs...");
 
-            if (especEncontrada.isPresent()) {
-                sistemaPrincipal = especEncontrada.get().getDescespec().toUpperCase();
+                // Varre as especialidades para encontrar o sistema principal
+                for (EspecialidadeDTO esp : especialidadesDTO) {
+                    Integer id = esp.getId(); // Agora chama o getId() do DTO corretamente
+                    
+                    System.out.println(" - ID Encontrado: " + id + " (" + esp.getNome() + ")");
+
+                    // --- MAPEMENTO OFICIAL (LISTA FORNECIDA) ---
+                    if (id == 9) { 
+                        sistemaPrincipal = "BIOMEDICINA";
+                        break;
+                    } else if (id == 4) { 
+                        sistemaPrincipal = "ODONTOLOGIA";
+                        break;
+                    } else if (id == 5) { 
+                        sistemaPrincipal = "NUTRICAO";
+                        break;
+                    } else if (id == 3) { 
+                        sistemaPrincipal = "PSICOLOGIA";
+                        break;
+                    } else if (id == 6) { 
+                        sistemaPrincipal = "FISIOTERAPIA";
+                        break;
+                    } 
+                    // IDs ignorados para layout principal: 1, 2, 7, 8, 10, 11
+                }
             }
-            // ---------------------------------------------------
 
+            // Define Cargo e Roteamento baseado no TIPOPROFI
             if (tipoProfi != null) {
                 switch (tipoProfi) {
                     case "1": 
                         cargo = "Administrador";
                         isSystemAdmin = true; 
-                        sistemaPrincipal = "CORINGA"; // Admin sempre cai no Coringa
+                        sistemaPrincipal = "CORINGA"; // Admin sempre vai para o Coringa
                         break;
                     case "2": 
                         cargo = "Profissional";
@@ -103,9 +132,14 @@ public class UserLoginController {
             }
         }
         
-        // Agora passamos o 'sistemaPrincipal' corretamente para o DTO
-        LoginResponse response = new LoginResponse(nome, cargo, isSystemAdmin, sistemaPrincipal, tipoProfi, especialidadesDTO);
-        return ResponseEntity.ok(response);
+        // Fallback: Se ainda for INDEFINIDO, usa BIOMEDICINA para não travar a tela
+        if (sistemaPrincipal.equals("INDEFINIDO")) {
+            sistemaPrincipal = "BIOMEDICINA"; 
+        }
+
+        System.out.println("LOGIN FINAL -> Sistema: " + sistemaPrincipal + " | Tipo: " + tipoProfi);
+
+        return ResponseEntity.ok(new LoginResponse(nome, cargo, isSystemAdmin, sistemaPrincipal, tipoProfi, especialidadesDTO));
     }
 }
 

@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             errorMessage.textContent = "";
 
-            // Fetch para a API
+            // Faz a requisição para o Java
             fetch("http://localhost:8080/api/auth/login", { 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -30,32 +30,36 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             })
             .then(data => {
-                console.log("Login sucesso:", data);
+                console.log("--- LOGIN SUCESSO ---");
+                console.log(data); // Para você conferir no F12
+
+                // 1. LIMPA DADOS ANTIGOS
+                localStorage.clear();
                 
-                // --- MUDANÇA AQUI (Passo 2): Salvar novos dados e Roteamento ---
-                
+                // 2. SALVA OS NOVOS DADOS NO NAVEGADOR
                 localStorage.setItem('userIsLoggedIn', 'true');
                 localStorage.setItem('userName', data.nome);
                 localStorage.setItem('userRole', data.cargo);
                 localStorage.setItem('tipoProfi', data.tipoProfi);
-                // Salva as especialidades como String JSON para usar depois
+                localStorage.setItem('isSystemAdmin', data.isSystemAdmin);
+                
+                // IMPORTANTE: Salva o sistema padrão calculado pelo Java (ex: "ODONTOLOGIA")
+                // Isso resolve o problema de quem não passa pela tela de seleção
+                localStorage.setItem('userSystem', data.sistema); 
+                
                 localStorage.setItem('userEspecialidades', JSON.stringify(data.especialidades));
 
-                // Lógica de Redirecionamento (Conforme seu Prompt)
+                // 3. ROTEAMENTO (Para onde cada um vai)
                 if (data.tipoProfi === '1') {
-                    // TIPO 1 = ADMINISTRADOR -> Vai para tela Administrativa (Coringa)
-                    // Obs: Precisamos criar 'admin-coringa.html' depois
+                    // Admin -> Tela Coringa
                     window.location.href = "/pages/admin-coringa.html"; 
-
                 } else if (data.tipoProfi === '4') {
-                    // TIPO 4 = MASTER -> Vai para tela de Seleção de Módulo
+                    // Master -> Tela de Seleção
                     window.location.href = "/pages/selecao-sistema.html"; 
-
                 } else {
-                    // TIPO 2 (Profissional) e 3 (Supervisor) -> Vai direto para o Módulo
+                    // Tipos 2 e 3 (Profissional/Supervisor) -> Direto para o sistema
                     window.location.href = "/pages/tela-principal.html"; 
                 }
-                // --- FIM DA MUDANÇA ---
             })
             .catch(error => {
                 console.error("Erro:", error);

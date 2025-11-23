@@ -24,14 +24,12 @@ public class Usuario {
     @JoinColumn(name = "ID_PROFISSIO")
     private Profissional profissional;
 
-    // --- MUDANÇA AQUI ---
-    // Mapeia o link direto com PESSOAFIS
-    @OneToOne
-    @JoinColumn(name = "ID_PESSOAFIS")
-    private PessoaFis pessoaFis;
+    // --- ATUALIZAÇÃO DB ---
+    // ID_PESSOAFIS removido.
+    // IDDOCUMENTO adicionado.
+    @Column(name = "IDDOCUMENTO")
+    private String idDocumento;
 
-    // Mapeia a tabela de permissões (USUAPERMIUSUA)
-    // (Mantido da nossa última alteração)
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "USUAPERMIUSUA",
@@ -39,7 +37,9 @@ public class Usuario {
         inverseJoinColumns = @JoinColumn(name = "ID_PERMIUSUA")
     )
     private Set<Permiusua> permissoes = new HashSet<>();
-    // --- FIM DA MUDANÇA ---
+
+    public Usuario() {
+    }
 
     // Getters e Setters
     public Integer getId() { return id; }
@@ -51,14 +51,13 @@ public class Usuario {
     public Profissional getProfissional() { return profissional; }
     public void setProfissional(Profissional profissional) { this.profissional = profissional; }
 
-    // Getter/Setter para PessoaFis
-    public PessoaFis getPessoaFis() { return pessoaFis; }
-    public void setPessoaFis(PessoaFis pessoaFis) { this.pessoaFis = pessoaFis; }
+    // Novo Getter/Setter para Documento
+    public String getIdDocumento() { return idDocumento; }
+    public void setIdDocumento(String idDocumento) { this.idDocumento = idDocumento; }
     
     public Set<Permiusua> getPermissoes() { return permissoes; }
     public void setPermissoes(Set<Permiusua> permissoes) { this.permissoes = permissoes; }
 
-    // ... (métodos equals e hashCode) ...
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

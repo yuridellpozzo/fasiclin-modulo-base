@@ -1,147 +1,92 @@
 /* =================================================================== */
-/* CONFIGURAÇÕES GLOBAIS DE FONTE (INTER) */
+/* ESTILOS BASE */
 /* =================================================================== */
 body {
-    /* Aplica a fonte Inter a todo o corpo da página */
-    font-family: 'Inter', sans-serif;
+    font-family: 'Poppins', sans-serif;
 }
 
-/* Ajuste de hierarquia de fontes para Títulos (Negrito) e Cargos (Mais Leve) */
 h1, h2, h3, h4, .offcanvas-title {
-    font-weight: 700; /* Negrito */
+    font-weight: 700;
 }
 
 .text-secondary {
-    font-weight: 300 !important; /* Leve para o cargo do usuário */
+    font-weight: 300 !important;
 }
 
 /* ------------------------------------------------------------------- */
-/* 1. ESTILIZAÇÃO DO TOGGLER (BOTÃO DOS 3 RISCOS) */
+/* 1. NAVBAR TOGGLER (Botão) */
 /* ------------------------------------------------------------------- */
 .navbar-toggler {
-    /* Define o fundo verde e a borda branca */
-    background-color: #198754; 
-    border-color: rgba(255, 255, 255, 0.5); 
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    
-    /* Adiciona a transição para suavizar a animação */
     transition: all 0.2s ease-in-out; 
 }
 
-/* Efeito ao passar o mouse (Hover) */
 .navbar-toggler:hover {
-    /* Aumenta o botão sutilmente */
     transform: scale(1.1); 
-    
-    /* Adiciona uma sombra para dar um efeito de elevação */
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); 
-    
-    /* Opcional: Escurece levemente o fundo (hover clássico) */
-    background-color: #157347; 
 }
 
-
-/* =================================================================== */
-/* 2. ESTILIZAÇÃO DOS BOTÕES DO OFFCANVAS (MÓDULOS) */
-/* =================================================================== */
+/* ------------------------------------------------------------------- */
+/* 2. BOTÕES DO MENU */
+/* ------------------------------------------------------------------- */
 .offcanvas-body .btn-success {
-    /* Aplica a borda branca aos botões de módulo */
     border: 1px solid rgba(255, 255, 255, 0.5); 
-    /* Garante que o raio de borda seja aplicado (se não for 0) */
     border-radius: 0.375rem; 
-}
-/* ------------------------------------------------------------------- */
-/* 4. EFEITO HOVER / DESTAQUE NOS BOTÕES DE MÓDULO (OFFCANVAS) */
-/* ------------------------------------------------------------------- */
-
-/* Aplica uma transição suave para as mudanças de estilo */
-.offcanvas-body .btn-success {
-    /* ... (manter as regras anteriores aqui) ... */
-    
-    /* Adiciona a transição para suavizar a mudança de cor e o zoom */
     transition: all 0.2s ease-in-out; 
 }
 
-/* Efeito ao passar o mouse: Inverte Cores e Aumenta sutilmente */
 .offcanvas-body .btn-success:hover {
-    /* 1. Mudar o fundo para BRANCO */
-    background-color: #ffffff !important; 
-    
-    /* 2. Mudar a letra para VERDE */
-    color: #198754 !important; 
-    
-    /* 3. Manter a borda verde no hover (opcional, mas fica bom) */
-    border-color: #198754 !important; 
-    
-    /* 4. Aumentar Sutilmente (Zoom) */
     transform: scale(1.02); 
-    
-    /* 5. Sombra para dar profundidade (opcional) */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* =================================================================== */
-/* 3. CORREÇÃO E ESTILIZAÇÃO DO BOTÃO "SAIR" (DROPDOWN) */
-/* =================================================================== */
-
-/* Corrige o item de lista (li) para remover o padding cinza em volta do botão */
+/* ------------------------------------------------------------------- */
+/* 3. DROPDOWN DO USUÁRIO */
+/* ------------------------------------------------------------------- */
 .dropdown-menu-dark li {
     padding: 0 !important;
     margin: 0 !important;
 }
 
-/* Remove o padding do menu para preencher toda a largura */
-.dropdown-menu-dark {
+.dropdown-menu {
     padding: 0 !important;
+    background-color: #ffffff !important;
+    border: 1px solid #dee2e6;
 }
 
-/* Força a cor inicial VERDE e centraliza o texto */
+/* Botão Sair (Mantém verde/vermelho fixo) */
 #btn-sair {
-    background-color: #198754 !important; /* Verde (btn-success) */
+    background-color: #198754 !important;
     color: white !important;
     text-align: center;
-    /* Define o raio de borda para o padrão do Bootstrap (0.375rem) */
     border-radius: 0.375rem !important; 
 }
 
-/* Altera a cor do botão "Sair" para VERMELHO ao passar o mouse (Hover) */
 #btn-sair:hover {
-    background-color: #dc3545 !important; /* Vermelho (btn-danger) */
+    background-color: #dc3545 !important;
     border-color: #dc3545 !important;
     color: white !important;
 }
 
-/* =================================================================== */
-/* 5. AJUSTE COR DE FUNDO (NAVBAR E OFFCANVAS) PARA PRETO */
-/* =================================================================== */
-.navbar.bg-dark {
-    /* Altera o fundo da navbar para PRETO PURO (#000000)
-       para combinar com o fundo da imagem dos ícones.
-    */
-    background-color: #000000 !important; 
-}
+/* ------------------------------------------------------------------- */
+/* 4. CORES E FUNDOS (LIMPEZA) */
+/* ------------------------------------------------------------------- */
+/* REMOVI AS REGRAS QUE FORÇAVAM PRETO AQUI. 
+   AGORA QUEM MANDA É O JAVASCRIPT OU O HTML INLINE. 
+*/
 
-.offcanvas.text-bg-dark {
-    /* Garante que o menu lateral (offcanvas) também seja PRETO PURO */
-    background-color: #000000 !important; 
-}
-
-
-/* =================================================================== */
-/* 6. CENTRALIZAÇÃO DOS ÍCONES NA NAVBAR */
-/* =================================================================== */
 .navbar-icons-centered {
-    position: absolute; /* Posicionamento absoluto */
-    left: 50%;          /* Começa no meio horizontal */
-    top: 50%;           /* Começa no meio vertical */
-    transform: translate(-50%, -50%); /* Puxa de volta pela metade do seu tamanho */
-    
-    /* Impede que os ícones capturem cliques (opcional, mas bom) */
+    position: absolute; 
+    left: 50%;          
+    top: 50%;           
+    transform: translate(-50%, -50%);
     pointer-events: none; 
 }
 
-/* Define a altura da imagem dos ícones na navbar */
 .navbar-icons-centered img {
-     /* Mantendo a altura da imagem maior, como solicitado antes */
      height: 70px; 
+}
+
+#user-display-role {
+    color: #000000 !important;
+    font-weight: 700 !important;
 }
