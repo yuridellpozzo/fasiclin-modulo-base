@@ -13,26 +13,18 @@ public class PessoaFis implements Serializable {
     @Column(name = "IDPESSOAFIS")
     private Integer idpessoafis;
 
-    // Coluna do nome, baseado no seu banco de dados
-    @Column(name = "NOMEPESSOA")
-    private String nomepessoa;
+    // --- MUDANÇA CRÍTICA: REMOVIDO 'NOMEPESSOA' DAQUI ---
+    // A coluna mudou para a tabela PESSOA, então tiramos daqui para não dar erro.
+    // ----------------------------------------------------
     
-    // Construtor vazio
+    @Column(name = "ID_PESSOA") // Adicionamos o vínculo com a tabela PESSOA
+    private Integer idPessoa;
+
     public PessoaFis() {}
 
-    // Getters e Setters
-    public Integer getIdpessoafis() {
-        return idpessoafis;
-    }
-    public void setIdpessoafis(Integer idpessoafis) {
-        this.idpessoafis = idpessoafis;
-    }
+    public Integer getIdpessoafis() { return idpessoafis; }
+    public void setIdpessoafis(Integer idpessoafis) { this.idpessoafis = idpessoafis; }
 
-    // Getter para o nome
-    public String getNomepessoa() {
-        return nomepessoa;
-    }
-    public void setNomepessoa(String nomepessoa) {
-        this.nomepessoa = nomepessoa;
-    }
+    public Integer getIdPessoa() { return idPessoa; }
+    public void setIdPessoa(Integer idPessoa) { this.idPessoa = idPessoa; }
 }

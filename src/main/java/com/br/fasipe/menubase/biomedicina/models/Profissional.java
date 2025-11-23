@@ -21,11 +21,11 @@ public class Profissional implements Serializable {
     @Column(name = "TIPOPROFI")
     private String tipoProfi;
 
-    // --- ATUALIZAÇÃO DB ---
-    // ID_PESSOAFIS removido.
-    // IDDOCUMENTO adicionado.
-    @Column(name = "IDDOCUMENTO")
+    // --- CORREÇÃO: IDDOCUMENTO (Conforme print do DBeaver) ---
+    @Column(name = "ID_DOCUMENTO")
     private String idDocumento;
+    
+    // REMOVIDO: private PessoaFis pessoaFis; (Não existe ID_PESSOAFIS aqui)
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -43,7 +43,6 @@ public class Profissional implements Serializable {
     public Integer getIdSupprofi() { return idSupprofi; }
     public void setIdSupprofi(Integer idSupprofi) { this.idSupprofi = idSupprofi; }
     
-    // Novo Getter/Setter
     public String getIdDocumento() { return idDocumento; }
     public void setIdDocumento(String idDocumento) { this.idDocumento = idDocumento; }
 

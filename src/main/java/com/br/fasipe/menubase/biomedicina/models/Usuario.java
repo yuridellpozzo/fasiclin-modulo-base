@@ -24,11 +24,18 @@ public class Usuario {
     @JoinColumn(name = "ID_PROFISSIO")
     private Profissional profissional;
 
-    // --- ATUALIZAÇÃO DB ---
-    // ID_PESSOAFIS removido.
-    // IDDOCUMENTO adicionado.
-    @Column(name = "IDDOCUMENTO")
-    private String idDocumento;
+    // --- MAPEAMENTO DUPLO (GARANTIA) ---
+    
+    // 1. Vínculo direto com Pessoa Física (se existir)
+    @OneToOne
+    @JoinColumn(name = "ID_PESSOAFIS")
+    private PessoaFis pessoaFis;
+
+    // 2. Coluna de Documento (se existir)
+    @Column(name = "ID_DOCUMENTO")
+    private String idDocumento; 
+
+    // -----------------------------------
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -38,8 +45,7 @@ public class Usuario {
     )
     private Set<Permiusua> permissoes = new HashSet<>();
 
-    public Usuario() {
-    }
+    public Usuario() {}
 
     // Getters e Setters
     public Integer getId() { return id; }
@@ -51,23 +57,13 @@ public class Usuario {
     public Profissional getProfissional() { return profissional; }
     public void setProfissional(Profissional profissional) { this.profissional = profissional; }
 
-    // Novo Getter/Setter para Documento
+    // Getters dos novos campos
+    public PessoaFis getPessoaFis() { return pessoaFis; }
+    public void setPessoaFis(PessoaFis pessoaFis) { this.pessoaFis = pessoaFis; }
+    
     public String getIdDocumento() { return idDocumento; }
     public void setIdDocumento(String idDocumento) { this.idDocumento = idDocumento; }
     
     public Set<Permiusua> getPermissoes() { return permissoes; }
     public void setPermissoes(Set<Permiusua> permissoes) { this.permissoes = permissoes; }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Usuario usuario = (Usuario) o;
-        return Objects.equals(id, usuario.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 }
