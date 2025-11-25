@@ -8,5 +8,15 @@
     "fontFamily" : "'Times New Roman', serif",
     "fontSize" : "18px",
     "language" : "en"
+  },
+  "ODONTOLOGIA" : {
+    "sistema" : "ODONTOLOGIA",
+    "logoBase64" : null,
+    "colorPrimary" : "#5fb3d3",
+    "colorSecondary" : "#4a90a4",
+    "colorText" : "#1f2937",
+    "fontFamily" : "'Inter', sans-serif",
+    "fontSize" : "16px",
+    "language" : "pt"
   }
 }
