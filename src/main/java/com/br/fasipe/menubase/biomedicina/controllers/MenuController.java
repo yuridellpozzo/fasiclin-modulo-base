@@ -26,73 +26,129 @@ public class MenuController {
         String sistemaUpper = sistema.toUpperCase();
         
         // =====================================================================
-        // ITENS PADRÃO (Profissional Básico - Tipo 2)
+        // 1. MENU ADMINISTRATIVO (CORINGA) - APENAS TIPO 1 (E MASTER 4)
         // =====================================================================
-        boolean isProfissionalBasico = checkPermissao(tipoProfi, "2");
-        
-        if (isProfissionalBasico && !sistemaUpper.equals("CORINGA")) {
-            menu.add(new MenuItemDTO("REGISTRO DE DOCS/MÍDIA", "#"));
+        if (sistemaUpper.equals("CORINGA")) {
+            if (checkPermissao(tipoProfi, "1")) {
+                menu.add(new MenuItemDTO("COMPRAS", "#"));
+                menu.add(new MenuItemDTO("ESTOQUE", "#"));
+                menu.add(new MenuItemDTO("CONTAS A PAGAR", "#"));
+                menu.add(new MenuItemDTO("VENDAS", "#"));
+                menu.add(new MenuItemDTO("CONTAS A RECEBER", "#"));
+                menu.add(new MenuItemDTO("--- GERAL ---", "#"));
+                // Exclusivo do Admin agora:
+                menu.add(new MenuItemDTO("CAD. DADOS PACIENTE", "#")); 
+                // Admin também vê e interage, conforme confirmado:
+                menu.add(new MenuItemDTO("REGISTRO DE DOCS. / MÍDIA", "#")); 
+            }
+            
+            // Se for Master acessando Coringa (para testes ou futuro), ele vê pelo checkPermissao("1")
+            // pois o método retorna true para 4.
+            return ResponseEntity.ok(menu);
+        }
+
+        // =====================================================================
+        // 2. ITENS COMUNS DE SAÚDE (Para Tipos 2, 3, 4 em qualquer módulo)
+        // =====================================================================
+        // "Cad. Dados Paciente" foi REMOVIDO daqui.
+        if (checkPermissao(tipoProfi, "2", "3")) {
             menu.add(new MenuItemDTO("CAD. ANAMNESE", "#"));
+            menu.add(new MenuItemDTO("REGISTRO DE DOCS. / MÍDIA", "#"));
             menu.add(new MenuItemDTO("REGISTRO DE PRONTUÁRIO", "#"));
             menu.add(new MenuItemDTO("--- ESPECÍFICO ---", "#")); 
         }
 
         // =====================================================================
-        // MENU ESPECÍFICO POR SISTEMA
+        // 3. MENU ESPECÍFICO POR ESPECIALIDADE
         // =====================================================================
         switch (sistemaUpper) {
             
+            // --- ODONTOLOGIA ---
             case "ODONTOLOGIA":
-                if (checkPermissao(tipoProfi, "2")) {
+                // Tipo 2 (Profissional) e 3 (Supervisor acompanha)
+                if (checkPermissao(tipoProfi, "2", "3")) {
                     menu.add(new MenuItemDTO("CAD. PRESCRIÇÃO DO PACIENTE", "#"));
                     menu.add(new MenuItemDTO("PRESCRIÇÃO DE MEDICAMENTOS", "#"));
-                }
-                if (checkPermissao(tipoProfi, "2", "3")) {
                     menu.add(new MenuItemDTO("ACOMP. EVOLUÇÃO PACIENTE", "#"));
                 }
+                // Tipo 3 (Supervisor homologa)
                 if (checkPermissao(tipoProfi, "3")) {
                     menu.add(new MenuItemDTO("HOMOLOGAÇÃO ODONTO", "#"));
                 }
-                // Nota: CAD. TRATAMENTO movido para o bloco global do Master abaixo
                 break;
 
+            // --- BIOMEDICINA ---
             case "BIOMEDICINA":
+                // Tipo 2 e 3
+                if (checkPermissao(tipoProfi, "2", "3")) {
+                    menu.add(new MenuItemDTO("RELATÓRIO DE PRODUÇÃO", "#"));
+                    menu.add(new MenuItemDTO("CADASTRO DE RESULTADOS", "#"));
+                    menu.add(new MenuItemDTO("CAD. PEDIDOS E PRESCRIÇÃO", "#"));
+                    menu.add(new MenuItemDTO("COLETA DE ASSINATURAS", "#"));
+                }
+                // Tipo 3 (Exclusivo Supervisor)
                 if (checkPermissao(tipoProfi, "3")) {
                     menu.add(new MenuItemDTO("IMPRESSÃO DE LAUDOS", "#"));
                     menu.add(new MenuItemDTO("EMISSÃO DE LAUDO", "#"));
                 }
-                if (checkPermissao(tipoProfi, "2")) {
-                    menu.add(new MenuItemDTO("RELATÓRIO DE PRODUÇÃO", "#"));
-                    menu.add(new MenuItemDTO("CADASTRO DE RESULTADOS", "#"));
-                }
+                break;
+
+            // --- NUTRIÇÃO ---
+            case "NUTRICAO":
+                // Tipo 2 e 3
                 if (checkPermissao(tipoProfi, "2", "3")) {
-                    menu.add(new MenuItemDTO("CAD. PEDIDOS E PRESCRIÇÃO", "#"));
-                    menu.add(new MenuItemDTO("COLETA DE ASSINATURAS", "#"));
+                    menu.add(new MenuItemDTO("AVALIAÇÃO NUTRICIONAL", "#"));
+                    menu.add(new MenuItemDTO("ACOMP. EVOLUÇÃO PACIENTE", "#"));
+                }
+                // Tipo 3
+                if (checkPermissao(tipoProfi, "3")) {
+                    menu.add(new MenuItemDTO("HOMOLOGAÇÃO NUTRI", "#"));
                 }
                 break;
-            
-            case "CORINGA":
-                 if (checkPermissao(tipoProfi, "1", "4")) {
-                    menu.add(new MenuItemDTO("CAD. DADOS PACIENTE", "#"));
-                    menu.add(new MenuItemDTO("REGISTRO DE DOCS/MÍDIA", "#"));
-                 }
-                 break;
+
+            // --- PSICOLOGIA ---
+            case "PSICOLOGIA":
+                // Tipo 2 e 3
+                if (checkPermissao(tipoProfi, "2", "3")) {
+                    menu.add(new MenuItemDTO("ACOMP. EVOLUÇÃO PACIENTE", "#"));
+                    // Adicionei CAD. PRESCRIÇÃO se fizer sentido para Psico, senão remova
+                    menu.add(new MenuItemDTO("CAD. PRESCRIÇÃO DO PACIENTE", "#")); 
+                }
+                // Tipo 3
+                if (checkPermissao(tipoProfi, "3")) {
+                    menu.add(new MenuItemDTO("HOMOLOGAÇÃO PSICO", "#"));
+                }
+                break;
+
+            // --- FISIOTERAPIA ---
+            case "FISIOTERAPIA":
+                // Tipo 2 e 3
+                if (checkPermissao(tipoProfi, "2", "3")) {
+                    menu.add(new MenuItemDTO("ACOMP. EVOLUÇÃO PACIENTE", "#"));
+                    // Fisio geralmente tem prescrição de exercícios/tratamento
+                    menu.add(new MenuItemDTO("CAD. PRESCRIÇÃO DO PACIENTE", "#"));
+                }
+                // Tipo 3
+                if (checkPermissao(tipoProfi, "3")) {
+                    menu.add(new MenuItemDTO("HOMOLOGAÇÃO FISIO", "#"));
+                }
+                break;
 
             default:
+                // Caso entre com um sistema não mapeado (Ex: Medicina)
                 if (tipoProfi.equals("4")) { 
-                   menu.add(new MenuItemDTO("Módulo não configurado: " + sistemaUpper, "#"));
+                   menu.add(new MenuItemDTO("Módulo em desenvolvimento: " + sistemaUpper, "#"));
                 }
         }
 
         // =====================================================================
-        // ÁREA EXCLUSIVA DO MASTER (TIPO 4)
+        // 4. RODAPÉ DO MASTER (TIPOPROFI = 4)
         // =====================================================================
         if (tipoProfi.equals("4")) {
-            
-            // 1. Funcionalidade de Gestão do Master (Antes das configurações)
-            menu.add(new MenuItemDTO("CAD. TRATAMENTO", "#")); // <-- ADICIONADO AQUI
+            // Funcionalidade Global de Master
+            menu.add(new MenuItemDTO("CAD. TRATAMENTO", "#")); 
 
-            // 2. Configurações do Sistema
+            // Configurações
             menu.add(new MenuItemDTO("--- ADMINISTRAÇÃO ---", "#"));
             menu.add(new MenuItemDTO("CONFIGURAÇÕES DO MÓDULO", "/pages/configuracoes.html"));
         }
@@ -103,7 +159,7 @@ public class MenuController {
     // Método auxiliar para verificar permissão
     private boolean checkPermissao(String usuarioTipo, String... tiposPermitidos) {
         
-        // O MASTER (4) tem acesso a TUDO
+        // REGRA DE OURO: O MASTER (4) tem acesso a TUDO do módulo dele.
         if (usuarioTipo.equals("4")) {
             return true;
         }
