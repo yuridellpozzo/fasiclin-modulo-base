@@ -1,0 +1,194 @@
+/* ==========================================
+   1. FUNDO COM IMAGEM FIXA
+   ========================================== */
+body {
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    position: relative;
+    background-color: #212529;
+    margin: 0;
+    overflow: hidden; /* Impede rolagem da página inteira */
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('/img/painel-inicial.avif'); 
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    opacity: 0.4; 
+    z-index: -1;
+}
+
+/* ==========================================
+   2. NAVBAR (TOPO)
+   ========================================== */
+.admin-navbar {
+    background-color: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 1rem 2rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 100;
+}
+
+.navbar-title-center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    pointer-events: none;
+}
+
+/* ==========================================
+   3. CARD CENTRAL
+   ========================================== */
+.admin-container {
+    max-width: 900px;
+    width: 90%;
+    position: absolute;
+    top: 55%; /* Posiciona um pouco abaixo do centro */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95); 
+    padding: 2rem 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+    backdrop-filter: blur(5px);
+    display: flex;
+    flex-direction: column;
+    max-height: 85vh; /* Limita a altura para permitir scroll interno */
+}
+
+.card-header-custom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    flex-shrink: 0;
+    position: relative;
+    min-height: 40px;
+}
+
+.card-title {
+    color: #198754; /* Verde do sistema */
+    font-weight: 700;
+    margin: 0;
+    flex-grow: 1;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+/* Botão Voltar (Seta) */
+#btn-back-menu {
+    color: #6c757d;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.2s;
+    position: absolute;
+    left: 0;
+    display: none; /* Começa invisível */
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+#btn-back-menu:hover {
+    color: #198754;
+}
+
+/* ==========================================
+   4. LISTA E ROLAGEM (SCROLLBAR)
+   ========================================== */
+#admin-buttons-container {
+    overflow-y: auto;       /* Habilita scroll vertical */
+    padding-right: 10px;
+    max-height: 55vh;       /* Altura máxima da área de botões */
+    flex-grow: 1;
+}
+
+/* Personalização da Barra de Rolagem */
+#admin-buttons-container::-webkit-scrollbar { width: 8px; }
+#admin-buttons-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+#admin-buttons-container::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+#admin-buttons-container::-webkit-scrollbar-thumb:hover { background: #198754; }
+
+/* ==========================================
+   5. BOTÕES
+   ========================================== */
+.btn-admin-custom {
+    background-color: #198754;
+    border: none;
+    color: white;
+    font-weight: 500;
+    text-align: left;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-admin-custom:hover {
+    background-color: #145c32; /* Verde escuro no hover */
+    color: white;
+    transform: translateX(5px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.admin-divider {
+    color: #6c757d;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ==========================================
+   6. RODAPÉ (LOGOUT)
+   ========================================== */
+.admin-footer {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e0e0e0;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.logout-btn {
+    color: #dc3545;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1px solid #dc3545;
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    transition: all 0.3s;
+    background: transparent;
+    display: inline-block;
+}
+
+.logout-btn:hover {
+    background-color: #dc3545;
+    color: white;
+    text-decoration: none;
+}

@@ -16,7 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
             errorMessage.textContent = "";
 
-            // Faz a requisição para o Java
             fetch("http://localhost:8080/api/auth/login", { 
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -30,34 +29,31 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             })
             .then(data => {
-                console.log("--- LOGIN SUCESSO ---");
-                console.log(data); // Para você conferir no F12
+                console.log("--- LOGIN SUCESSO ---", data);
 
                 // 1. LIMPA DADOS ANTIGOS
                 localStorage.clear();
                 
-                // 2. SALVA OS NOVOS DADOS NO NAVEGADOR
+                // 2. SALVA OS NOVOS DADOS
                 localStorage.setItem('userIsLoggedIn', 'true');
                 localStorage.setItem('userName', data.nome);
                 localStorage.setItem('userRole', data.cargo);
                 localStorage.setItem('tipoProfi', data.tipoProfi);
                 localStorage.setItem('isSystemAdmin', data.isSystemAdmin);
-                
-                // IMPORTANTE: Salva o sistema padrão calculado pelo Java (ex: "ODONTOLOGIA")
-                // Isso resolve o problema de quem não passa pela tela de seleção
                 localStorage.setItem('userSystem', data.sistema); 
-                
                 localStorage.setItem('userEspecialidades', JSON.stringify(data.especialidades));
 
-                // 3. ROTEAMENTO (Para onde cada um vai)
+                // 3. ROTEAMENTO (AJUSTADO CONFORME SEU PEDIDO)
                 if (data.tipoProfi === '1') {
-                    // Admin -> Tela Coringa
+                    // TIPO 1 (ADMIN) -> Vai para o PAINEL ADMINISTRATIVO Próprio
                     window.location.href = "/pages/admin-coringa.html"; 
+                
                 } else if (data.tipoProfi === '4') {
-                    // Master -> Tela de Seleção
+                    // TIPO 4 (MASTER) -> Vai para Seleção
                     window.location.href = "/pages/selecao-sistema.html"; 
+                
                 } else {
-                    // Tipos 2 e 3 (Profissional/Supervisor) -> Direto para o sistema
+                    // TIPOS 2 e 3 (SAÚDE) -> Vão para a Tela Principal
                     window.location.href = "/pages/tela-principal.html"; 
                 }
             })
