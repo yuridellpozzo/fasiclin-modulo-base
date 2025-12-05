@@ -12,10 +12,35 @@ const SUB_MENUS = {
         { name: "CADASTRO DE PRODUTOS/SERVIÇOS", url: "#" },
         { name: "CONFIGURAÇÕES", url: "#" }
     ],
-    "ESTOQUE": [],
-    "VENDAS": [],
-    "CONTAS A PAGAR": [],
-    "CONTAS A RECEBER": [],
+    "ESTOQUE": [
+        { name: "RELATÓRIO DE PEDIDOS EM ABERTO", url: "#" },
+        { name: "PEDIDO DE MATERIAIS", url: "#" },
+        { name: "MOVIMENTAÇÃO ENTRE ESTOQUES", url: "#" },
+        { name: "BAIXA DE ESTOQUE", url: "#" },
+        { name: "ORDEM DE COMPRA", url: "#" },
+        { name: "RECEBER PEDIDO DE FORNECEDOR", url: "#" },
+        { name: "CONFIGURAÇÕES", url: "#" },
+    ],
+    "VENDAS": [
+        { name: "EMISSÃO DE RECIBO/NOTA FISCAL", url: "#" },
+        { name: "RELATÓRIO DE VENDAS", url: "#" },
+        { name: "CONFIGURAÇÕES", url: "#" }, 
+    ],
+    "CONTAS A PAGAR": [
+        { name: "CADASTRO DE PAGAMENTOS", url: "#" },
+        { name: "PEDIDO AUTOMATICO DE PAGAMENTO", url: "#" },
+        { name: "CONFIGURAÇÕES DE PAGAMENTOS", url: "#" },
+        { name: "CADASTRO DE ORIENTAÇÕES DE PAGAMENTO", url: "#" },
+        { name: "RELATÓRIOS", url: "#" },
+        { name: "ORDEM DE PAGAMENTO", url: "#" },
+        { name: "CONFIGURAÇÕES", url: "#" },
+    ],
+    "CONTAS A RECEBER": [
+        { name: "CADASTRO DE RECEBÍVEIS", url: "#" },
+        { name: "RELATÓRIO DE MOVIMENTAÇÃO DE RECEBIMENTOS", url: "#" },
+        { name: "CONTROLE DE COBRANÇA", url: "#" },
+        { name: "CONFIGURAÇÕES", url: "#" },
+    ],
     // "CAD. DADOS PACIENTE" não precisa estar aqui pois é link direto
 };
 

@@ -178,10 +178,12 @@ function renderTheme(config) {
 function getDefaultLogoUrl(sistema) {
     const sys = sistema ? sistema.toUpperCase() : "";
     switch (sys) {
-        case 'BIOMEDICINA': return '/img/icones-pequenos-topo-bio.jpg';
+        case 'BIOMEDICINA': return '/img/icones-peq-topo-bio.jpg';
         case 'ODONTOLOGIA': return '/img/icones-peq-topo-odonto.png';
-        case 'NUTRICAO': return '/img/logo-nutricao.jpg';
-        default: return '/img/icones-pequenos-topo-bio.jpg';
+        case 'NUTRICAO': return '/img/icones-peq-topo-nutri.avif';
+        case 'PSICOLOGIA': return '/img/icones-peq-topo-psico.avif';
+        case 'FISIOTERAPIA': return '/img/icones-peq-topo-fisio.jpg';
+        default: return '/img/icones-peq-topo-bio.jpg';
     }
 }
 
