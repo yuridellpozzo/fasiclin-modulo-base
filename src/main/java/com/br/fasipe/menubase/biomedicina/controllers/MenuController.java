@@ -26,6 +26,7 @@ public class MenuController {
         String sistemaUpper = sistema.toUpperCase();
         
         // =====================================================================
+<<<<<<< HEAD
         // 1. MENU ADMINISTRATIVO (CORINGA) - APENAS TIPO 1 (E MASTER 4)
         // =====================================================================
         if (sistemaUpper.equals("CORINGA")) {
@@ -52,6 +53,38 @@ public class MenuController {
         // =====================================================================
         // "Cad. Dados Paciente" foi REMOVIDO daqui.
         if (checkPermissao(tipoProfi, "2", "3")) {
+=======
+        // 1. MENU ADMINISTRATIVO (CORINGA) - APENAS TIPO 1 (Admin) e TIPO 4 (Master)
+        // =====================================================================
+        if (sistemaUpper.equals("CORINGA")) {
+            // Se for Tipo 1 (Admin) ou 4 (Master acessando Coringa)
+            if (checkPermissao(tipoProfi, "1", "4")) {
+                
+                // --- MÓDULOS DE GESTÃO ---
+                menu.add(new MenuItemDTO("COMPRAS", "#"));
+                menu.add(new MenuItemDTO("ESTOQUE", "#"));
+                menu.add(new MenuItemDTO("CONTAS A PAGAR", "#"));
+                menu.add(new MenuItemDTO("VENDAS", "#"));
+                menu.add(new MenuItemDTO("CONTAS A RECEBER", "#"));
+                
+                menu.add(new MenuItemDTO("--- OPERACIONAL ---", "#"));
+                
+                // --- MÓDULOS OPERACIONAIS (Que saíram da saúde) ---
+                menu.add(new MenuItemDTO("CAD. DADOS PACIENTE", "#"));
+                menu.add(new MenuItemDTO("REGISTRO DE DOCS. / MÍDIA", "#"));
+            }
+            
+            return ResponseEntity.ok(menu);
+        }
+
+        // =====================================================================
+        // 2. ITENS PADRÃO (Profissional Básico - Tipo 2) - Módulos de Saúde
+        // =====================================================================
+        boolean isProfissionalBasico = checkPermissao(tipoProfi, "2");
+        
+        if (isProfissionalBasico) {
+            menu.add(new MenuItemDTO("REGISTRO DE DOCS/MÍDIA", "#"));
+>>>>>>> 9caf072e0aef1bb8cce2d62f28551fc29c65e3dc
             menu.add(new MenuItemDTO("CAD. ANAMNESE", "#"));
             menu.add(new MenuItemDTO("REGISTRO DE DOCS. / MÍDIA", "#"));
             menu.add(new MenuItemDTO("REGISTRO DE PRONTUÁRIO", "#"));
@@ -133,6 +166,25 @@ public class MenuController {
                     menu.add(new MenuItemDTO("HOMOLOGAÇÃO FISIO", "#"));
                 }
                 break;
+<<<<<<< HEAD
+=======
+                
+            case "NUTRICAO":
+                if (checkPermissao(tipoProfi, "2")) menu.add(new MenuItemDTO("AVALIAÇÃO NUTRICIONAL", "#"));
+                if (checkPermissao(tipoProfi, "2", "3")) menu.add(new MenuItemDTO("ACOMP. EVOLUÇÃO PACIENTE", "#"));
+                if (checkPermissao(tipoProfi, "3")) menu.add(new MenuItemDTO("HOMOLOGAÇÃO NUTRI", "#"));
+                break;
+
+            case "PSICOLOGIA":
+                if (checkPermissao(tipoProfi, "2", "3")) menu.add(new MenuItemDTO("ACOMP. EVOLUÇÃO PACIENTE", "#"));
+                if (checkPermissao(tipoProfi, "3")) menu.add(new MenuItemDTO("HOMOLOGAÇÃO PSICO", "#"));
+                break;
+                
+            case "FISIOTERAPIA":
+                if (checkPermissao(tipoProfi, "2", "3")) menu.add(new MenuItemDTO("ACOMP. EVOLUÇÃO PACIENTE", "#"));
+                if (checkPermissao(tipoProfi, "3")) menu.add(new MenuItemDTO("HOMOLOGAÇÃO FISIO", "#"));
+                break;
+>>>>>>> 9caf072e0aef1bb8cce2d62f28551fc29c65e3dc
 
             default:
                 // Caso entre com um sistema não mapeado (Ex: Medicina)
@@ -145,10 +197,14 @@ public class MenuController {
         // 4. RODAPÉ DO MASTER (TIPOPROFI = 4)
         // =====================================================================
         if (tipoProfi.equals("4")) {
+<<<<<<< HEAD
             // Funcionalidade Global de Master
             menu.add(new MenuItemDTO("CAD. TRATAMENTO", "#")); 
 
             // Configurações
+=======
+            menu.add(new MenuItemDTO("CAD. TRATAMENTO", "#")); 
+>>>>>>> 9caf072e0aef1bb8cce2d62f28551fc29c65e3dc
             menu.add(new MenuItemDTO("--- ADMINISTRAÇÃO ---", "#"));
             menu.add(new MenuItemDTO("CONFIGURAÇÕES DO MÓDULO", "/pages/configuracoes.html"));
         }
@@ -156,18 +212,19 @@ public class MenuController {
         return ResponseEntity.ok(menu);
     }
 
-    // Método auxiliar para verificar permissão
     private boolean checkPermissao(String usuarioTipo, String... tiposPermitidos) {
+<<<<<<< HEAD
         
         // REGRA DE OURO: O MASTER (4) tem acesso a TUDO do módulo dele.
         if (usuarioTipo.equals("4")) {
             return true;
         }
         
+=======
+        if (usuarioTipo.equals("4")) return true; // Master vê tudo
+>>>>>>> 9caf072e0aef1bb8cce2d62f28551fc29c65e3dc
         for (String tipo : tiposPermitidos) {
-            if (usuarioTipo.equals(tipo)) {
-                return true;
-            }
+            if (usuarioTipo.equals(tipo)) return true;
         }
         return false;
     }
