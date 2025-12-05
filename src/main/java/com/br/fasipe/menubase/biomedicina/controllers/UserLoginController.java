@@ -42,37 +42,35 @@ public class UserLoginController {
         Usuario usuario = usuarioOpcional.get();
         Profissional profissional = usuario.getProfissional();
 
-        // --- 1. BUSCA DO NOME (LÓGICA NOVA) ---
-        String nome = usuario.getLogin().toUpperCase(); // Fallback
-        
+        // --- CORREÇÃO NA BUSCA DO NOME ---
+        String nome = usuario.getLogin().toUpperCase(); // Nome padrão (Login)
+        Integer idPessoaParaBusca = null;
+
         try {
-            // Verifica se o usuário tem o vínculo com PessoaFis
+            // 1. Tenta pegar o ID_PESSOA através do usuário -> PessoaFis
             if (usuario.getPessoaFis() != null) {
-                // Pega o ID_PESSOA de dentro da PessoaFis
-                Integer idPessoa = usuario.getPessoaFis().getIdPessoa();
-                
-                if (idPessoa != null) {
-                    // Vai no banco buscar o nome na tabela PESSOA
-                    String nomeBanco = usuarioRepository.findNomeByIdPessoa(idPessoa);
-                    
-                    if (nomeBanco != null && !nomeBanco.isEmpty()) {
-                        nome = nomeBanco; // Sucesso!
-                    }
+                idPessoaParaBusca = usuario.getPessoaFis().getIdPessoa();
+                // OBS: Não chamamos mais .getNomepessoa() aqui pois o campo não existe mais na classe
+            }
+            
+            // 2. Se achou o ID, vai no banco buscar o NOME na tabela PESSOA
+            if (idPessoaParaBusca != null) {
+                String nomeBanco = usuarioRepository.findNomeByIdPessoa(idPessoaParaBusca);
+                if (nomeBanco != null && !nomeBanco.isEmpty()) {
+                    nome = nomeBanco; // SUCESSO!
                 }
             }
         } catch (Exception e) {
-            System.out.println("Erro ao buscar nome na tabela PESSOA: " + e.getMessage());
+            System.out.println("Erro ao buscar nome real: " + e.getMessage());
         }
-        // --------------------------------------
 
-        // --- 2. VARIÁVEIS ---
+        // --- VARIÁVEIS DE RESPOSTA ---
         String cargo = "Indefinido";
         String tipoProfi = "0";
         boolean isSystemAdmin = false;
         String sistemaPrincipal = "INDEFINIDO"; 
         List<EspecialidadeDTO> especialidadesDTO = List.of();
 
-        // --- 3. LÓGICA DE SISTEMA ---
         if (profissional != null) {
             tipoProfi = profissional.getTipoProfi(); 
             
@@ -81,7 +79,6 @@ public class UserLoginController {
                     .map(e -> new EspecialidadeDTO(e.getIdespec(), e.getDescespec()))
                     .collect(Collectors.toList());
 
-                // Mapeamento
                 for (EspecialidadeDTO esp : especialidadesDTO) {
                     Integer id = esp.getId();
                     if (id == 9) { sistemaPrincipal = "BIOMEDICINA"; break; }
@@ -105,7 +102,7 @@ public class UserLoginController {
         
         if (sistemaPrincipal.equals("INDEFINIDO")) sistemaPrincipal = "BIOMEDICINA"; 
 
-        System.out.println("LOGIN -> Nome: " + nome + " | Sistema: " + sistemaPrincipal);
+        System.out.println("LOGIN SUCESSO -> Nome: " + nome + " | Sistema: " + sistemaPrincipal);
 
         return ResponseEntity.ok(new LoginResponse(nome, cargo, isSystemAdmin, sistemaPrincipal, tipoProfi, especialidadesDTO));
     }

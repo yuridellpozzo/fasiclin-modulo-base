@@ -27,3 +27,7 @@ Padrão: Fundo verde, texto branco.
 Hover: Fundo vermelho, texto branco.
 Botão de Login:
 Padrão: Fundo verde, texto branco, com um leve efeito de zoom ao passar o mouse.
+
+
+------ 
+o supervisor fernanda ver é pq ela é de fisio, mas nesse caso eu quero que qualquer supervisor de fisioterapia veja essa homologação, e respondendo essa sua duvida do porém, nossa função não é criar ou mexer com o botão do estagiário para ele visualizar ou acompanhar, pois isso é modulo de outra pessoa fazer da nossa sala, mas isso não quer dizer que não podemos deixar um select interno no mesmo botao 
