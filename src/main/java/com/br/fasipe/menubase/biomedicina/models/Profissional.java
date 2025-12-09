@@ -1,31 +1,31 @@
 package com.br.fasipe.menubase.biomedicina.models;
 
 import jakarta.persistence.*;
-import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "PROFISSIONAL")
-public class Profissional implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class Profissional {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "IDPROFISSIO")
-    private Integer idprofissio;
-
-    @Column(name = "ID_SUPPROFI")
-    private Integer idSupprofi;
+    private Integer id;
 
     @Column(name = "TIPOPROFI")
     private String tipoProfi;
 
-    // --- CORREÇÃO: IDDOCUMENTO (Conforme print do DBeaver) ---
     @Column(name = "ID_DOCUMENTO")
-    private String idDocumento;
-    
-    // REMOVIDO: private PessoaFis pessoaFis; (Não existe ID_PESSOAFIS aqui)
+    private Long idDocumento;
+
+    @Column(name = "ID_CONSEPROFI")
+    private Integer idConselho;
+
+    @OneToOne(mappedBy = "profissional")
+    private Usuario usuario;
+
+    // --- REMOVIDO: private PessoaFis pessoaFis; --- 
+    // (Removemos porque a coluna ID_PESSOAFIS não existe nesta tabela)
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -33,19 +33,24 @@ public class Profissional implements Serializable {
         joinColumns = @JoinColumn(name = "ID_PROFISSIO"),
         inverseJoinColumns = @JoinColumn(name = "ID_ESPEC")
     )
-    private Set<Especialidade> especialidades = new HashSet<>();
+    private Set<Especialidade> especialidades;
 
-    // Getters e Setters
+    // --- GETTERS E SETTERS ---
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+
     public String getTipoProfi() { return tipoProfi; }
     public void setTipoProfi(String tipoProfi) { this.tipoProfi = tipoProfi; }
-    public Integer getIdprofissio() {return idprofissio;}
-    public void setIdprofissio(Integer idprofissio) { this.idprofissio = idprofissio; }
-    public Integer getIdSupprofi() { return idSupprofi; }
-    public void setIdSupprofi(Integer idSupprofi) { this.idSupprofi = idSupprofi; }
-    
-    public String getIdDocumento() { return idDocumento; }
-    public void setIdDocumento(String idDocumento) { this.idDocumento = idDocumento; }
+
+    public Long getIdDocumento() { return idDocumento; }
+    public void setIdDocumento(Long idDocumento) { this.idDocumento = idDocumento; }
+
+    public Integer getIdConselho() { return idConselho; }
+    public void setIdConselho(Integer idConselho) { this.idConselho = idConselho; }
 
     public Set<Especialidade> getEspecialidades() { return especialidades; }
     public void setEspecialidades(Set<Especialidade> especialidades) { this.especialidades = especialidades; }
+    
+    public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
 }

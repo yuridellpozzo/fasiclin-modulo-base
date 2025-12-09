@@ -8,7 +8,11 @@ import java.util.List;
 
 public interface ProntuarioTemporarioRepository extends JpaRepository<ProntuarioTemporario, Integer> {
     
-    // Busca apenas os que estão AGUARDANDO e são da especialidade certa (ex: Fisio=63)
-    @Query(value = "SELECT * FROM PRONTUARIO_TEMPORARIO WHERE ID_ESPEC = :idEspec AND STATUS_HOMOLOGACAO = 'AGUARDANDO'", nativeQuery = true)
+    // Lista para o Supervisor (Status PENDENTE)
+    @Query(value = "SELECT * FROM PRONTUARIO_TEMPORARIO WHERE ID_ESPEC = :idEspec AND STATUS_APROVACAO = 'PENDENTE'", nativeQuery = true)
     List<ProntuarioTemporario> findPendentesPorEspecialidade(@Param("idEspec") Integer idEspec);
+
+    // --- NOVO: Lista para o Estagiário (Status REPROVADO e ID dele) ---
+    @Query(value = "SELECT * FROM PRONTUARIO_TEMPORARIO WHERE ID_PROFISSIO = :idAluno AND STATUS_APROVACAO = 'REPROVADO'", nativeQuery = true)
+    List<ProntuarioTemporario> findReprovadosPorAluno(@Param("idAluno") Integer idAluno);
 }

@@ -43,6 +43,8 @@ public class MenuController {
                 // --- MÓDULOS OPERACIONAIS (Que saíram da saúde) ---
                 menu.add(new MenuItemDTO("CAD. DADOS PACIENTE", "#"));
                 menu.add(new MenuItemDTO("REGISTRO DE DOCS. / MÍDIA", "#"));
+                menu.add(new MenuItemDTO("CADASTRAR USUÁRIO", "/pages/cadastro-usuario.html"));
+                menu.add(new MenuItemDTO("GESTÃO DE ADMINS", "/pages/gestao-equipe.html"));
             }
             
             return ResponseEntity.ok(menu);
@@ -124,15 +126,17 @@ public class MenuController {
 
             // --- FISIOTERAPIA ---
             case "FISIOTERAPIA":
-                // Tipo 2 e 3
                 if (checkPermissao(tipoProfi, "2", "3")) {
                     menu.add(new MenuItemDTO("ACOMP. EVOLUÇÃO PACIENTE", "#"));
-                    // Fisio geralmente tem prescrição de exercícios/tratamento
-                    menu.add(new MenuItemDTO("CAD. PRESCRIÇÃO DO PACIENTE", "#"));
+                    menu.add(new MenuItemDTO("CAD. PRESCRIÇÃO DO PACIENTE", "/pages/prescricao.html"));
+                    
+                    // --- NOVO BOTÃO ---
+                    menu.add(new MenuItemDTO("PRONTUÁRIOS DEVOLVIDOS", "/pages/correcoes.html"));
                 }
+                // ... resto do código ...
                 // Tipo 3
                 if (checkPermissao(tipoProfi, "3")) {
-                    menu.add(new MenuItemDTO("HOMOLOGAÇÃO FISIO", "#"));
+                    menu.add(new MenuItemDTO("HOMOLOGAÇÃO FISIO", "/pages/homologacao.html"));
                 }
                 break;
             default:
@@ -150,7 +154,9 @@ public class MenuController {
             menu.add(new MenuItemDTO("CAD. TRATAMENTO", "#")); 
             // Configurações
             menu.add(new MenuItemDTO("--- ADMINISTRAÇÃO ---", "#"));
+            menu.add(new MenuItemDTO("CADASTRAR USUÁRIO", "/pages/cadastro-usuario.html"));
             menu.add(new MenuItemDTO("CONFIGURAÇÕES DO MÓDULO", "/pages/configuracoes.html"));
+            menu.add(new MenuItemDTO("GESTÃO DA EQUIPE", "/pages/gestao-equipe.html"));
         }
 
         return ResponseEntity.ok(menu);

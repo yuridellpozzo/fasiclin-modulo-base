@@ -1,30 +1,31 @@
 package com.br.fasipe.menubase.biomedicina.models;
 
 import jakarta.persistence.*;
-import java.io.Serializable;
 
 @Entity
 @Table(name = "PESSOAFIS")
-public class PessoaFis implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class PessoaFis {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "IDPESSOAFIS")
-    private Integer idpessoafis;
+    private Integer id; // Manual
 
-    // --- MUDANÇA CRÍTICA: REMOVIDO 'NOMEPESSOA' DAQUI ---
-    // A coluna mudou para a tabela PESSOA, então tiramos daqui para não dar erro.
-    // ----------------------------------------------------
-    
-    @Column(name = "ID_PESSOA") // Adicionamos o vínculo com a tabela PESSOA
+    @Column(name = "ID_PESSOA")
     private Integer idPessoa;
+
+    // --- CORREÇÃO AQUI: ADICIONANDO O CAMPO OBRIGATÓRIO ---
+    @Column(name = "ID_DOCUMENTO")
+    private Long idDocumento;
 
     public PessoaFis() {}
 
-    public Integer getIdpessoafis() { return idpessoafis; }
-    public void setIdpessoafis(Integer idpessoafis) { this.idpessoafis = idpessoafis; }
+    // Getters e Setters
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
     public Integer getIdPessoa() { return idPessoa; }
     public void setIdPessoa(Integer idPessoa) { this.idPessoa = idPessoa; }
+
+    public Long getIdDocumento() { return idDocumento; }
+    public void setIdDocumento(Long idDocumento) { this.idDocumento = idDocumento; }
 }

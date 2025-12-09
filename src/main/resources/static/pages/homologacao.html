@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/theme.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; font-family: 'Poppins', sans-serif; padding: 20px; }
+        .card { border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border-radius: 12px; }
+        .table th { font-weight: 600; color: #555; }
+        .status-badge { padding: 5px 10px; border-radius: 15px; font-size: 0.85rem; font-weight: 600; }
+        .bg-pendente { background-color: #ffeeba; color: #856404; }
+        
+        /* Garante que o texto longo tenha quebra de linha no modal */
+        .texto-leitura {
+            white-space: pre-wrap; 
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            min-height: 150px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-fluid">
+        <div class="card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="text-success fw-bold m-0">Homologação de Prontuários - Fisioterapia</h4>
+                <button class="btn btn-outline-success btn-sm" onclick="carregarPendentes()">
+                    Atualizar Lista
+                </button>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Paciente (ID)</th>
+                            <th>Estagiário</th>
+                            <th>Data</th>
+                            <th>Descrição Resumida</th>
+                            <th>Status</th>
+                            <th class="text-end" style="min-width: 220px;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-pendentes">
+                        <tr><td colspan="7" class="text-center p-4">Carregando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalVisualizar" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Detalhes do Prontuário</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h6 class="fw-bold text-muted">Descrição Completa do Procedimento:</h6>
+                    <div id="textoCompleto" class="texto-leitura"></div>
+                    
+                    <div class="mt-3" id="linkContainer" style="display: none;">
+                        <strong>Link Externo:</strong> <a href="#" id="linkExterno" target="_blank">Acessar</a>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-danger" onclick="fecharModalEAcionar('corrigir')">Reprovar/Corrigir</button>
+                    <button type="button" class="btn btn-success" onclick="fecharModalEAcionar('aprovar')">Aprovar Agora</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalCorrecao" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">Solicitar Correção</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Descreva o motivo da devolução para o estagiário:</p>
+                    <textarea class="form-control" id="motivoCorrecao" rows="4" placeholder="Ex: Falta detalhar os exercícios..."></textarea>
+                    <input type="hidden" id="idTempCorrecao">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-warning" onclick="enviarCorrecao()">Confirmar Devolução</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const ID_ESPEC = 6; 
+        const idSupervisor = window.parent.localStorage.getItem('idProfissional') || 1; 
+        
+        // Variável global para guardar a lista e recuperar o texto completo depois
+        let CACHE_LISTA = [];
+        let ID_SELECIONADO_LEITURA = null; // Para saber qual ID está aberto no modal de leitura
+
+        document.addEventListener('DOMContentLoaded', carregarPendentes);
+
+        async function carregarPendentes() {
+            const tbody = document.getElementById('tabela-pendentes');
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center">Buscando...</td></tr>';
+
+            try {
+                const res = await fetch(`http://localhost:8080/api/homologacao/pendentes/${ID_ESPEC}`);
+                if (!res.ok) throw new Error('Erro ao buscar');
+                const lista = await res.json();
+                
+                // Guarda na memória
+                CACHE_LISTA = lista;
+
+                tbody.innerHTML = '';
+                
+                if (lista.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Nenhum prontuário pendente de aprovação.</td></tr>';
+                    return;
+                }
+
+                lista.forEach(item => {
+                    const nomeAluno = item.aluno && item.aluno.pessoaFis ? item.aluno.pessoaFis.nomepessoa : (item.aluno ? "ID: " + item.aluno.idprofissio : "?");
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>#${item.id}</td>
+                        <td>${item.idPaciente}</td>
+                        <td>${nomeAluno}</td>
+                        <td>${item.dataProced || '-'}</td>
+                        <td>${item.texto ? item.texto.substring(0, 40) + '...' : '-'}</td>
+                        <td><span class="status-badge bg-pendente">${item.status}</span></td>
+                        <td class="text-end">
+                            <button class="btn btn-sm btn-info text-white me-1" title="Ler Completo" onclick="verDetalhes(${item.id})">Ver</button>
+                            <button class="btn btn-sm btn-success me-1" title="Aprovar" onclick="aprovar(${item.id})">Aprovar</button>
+                            <button class="btn btn-sm btn-danger" title="Devolver" onclick="abrirModalCorrecao(${item.id})">Corrigir</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Erro de conexão.</td></tr>';
+            }
+        }
+
+        // --- NOVA FUNÇÃO: VER DETALHES ---
+        function verDetalhes(id) {
+            // Busca o item na memória pelo ID
+            const item = CACHE_LISTA.find(i => i.id === id);
+            
+            if (item) {
+                ID_SELECIONADO_LEITURA = id;
+                document.getElementById('textoCompleto').textContent = item.texto || "Sem descrição.";
+                
+                const linkDiv = document.getElementById('linkContainer');
+                const linkTag = document.getElementById('linkExterno');
+                
+                if (item.linkProcedimento) {
+                    linkDiv.style.display = 'block';
+                    linkTag.href = item.linkProcedimento;
+                } else {
+                    linkDiv.style.display = 'none';
+                }
+
+                new bootstrap.Modal(document.getElementById('modalVisualizar')).show();
+            }
+        }
+
+        // --- AÇÃO RÁPIDA DENTRO DO MODAL DE LEITURA ---
+        function fecharModalEAcionar(acao) {
+            // Fecha o modal de leitura
+            const modalLeitura = bootstrap.Modal.getInstance(document.getElementById('modalVisualizar'));
+            modalLeitura.hide();
+
+            // Aciona a função correspondente após um pequeno delay visual
+            setTimeout(() => {
+                if (acao === 'aprovar') aprovar(ID_SELECIONADO_LEITURA);
+                if (acao === 'corrigir') abrirModalCorrecao(ID_SELECIONADO_LEITURA);
+            }, 300);
+        }
+
+        async function aprovar(id) {
+            if(!confirm("Confirma a aprovação deste prontuário? Ele será oficializado.")) return;
+
+            try {
+                const res = await fetch(`http://localhost:8080/api/homologacao/aprovar/${id}?idSupervisor=${idSupervisor}`, {
+                    method: 'POST'
+                });
+
+                if (res.ok) {
+                    alert("Aprovado com sucesso!");
+                    carregarPendentes();
+                } else {
+                    alert("Erro ao aprovar.");
+                }
+            } catch (e) { alert("Erro de conexão."); }
+        }
+
+        function abrirModalCorrecao(id) {
+            document.getElementById('idTempCorrecao').value = id;
+            document.getElementById('motivoCorrecao').value = '';
+            new bootstrap.Modal(document.getElementById('modalCorrecao')).show();
+        }
+
+        async function enviarCorrecao() {
+            const id = document.getElementById('idTempCorrecao').value;
+            const motivo = document.getElementById('motivoCorrecao').value;
+
+            if(!motivo) { alert("Escreva o motivo."); return; }
+
+            try {
+                const res = await fetch(`http://localhost:8080/api/homologacao/corrigir/${id}?idSupervisor=${idSupervisor}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'text/plain'}, 
+                    body: motivo
+                });
+
+                if (res.ok) {
+                    alert("Devolvido para correção!");
+                    location.reload(); 
+                } else {
+                    alert("Erro ao enviar.");
+                }
+            } catch (e) { alert("Erro de conexão."); }
+        }
+    </script>
+</body>
+</html>

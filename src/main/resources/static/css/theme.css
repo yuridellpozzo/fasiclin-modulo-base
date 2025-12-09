@@ -1,0 +1,156 @@
+/* --- THEME.CSS: Padrão Visual Clean (Estilo João Lemes) --- */
+
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap');
+
+:root {
+    /* --- PALETA NOVA --- */
+    --cor-verde-principal: #00a32a; 
+    --cor-verde-hover: #008f24; 
+    --cor-fundo-pagina: #eef0e5; /* Creme/Cinza Claro */
+    --cor-input-fundo: #f2f4f2;
+    --cor-input-borda-hover: #bdbdbd;
+    --cor-texto-principal: #121212; 
+    --cor-branco: #ffffff;
+    --borda-raio: 8px;
+}
+
+/* ==========================================================================
+   1. RESETA O FUNDO E MATA A IMAGEM DO PRÉDIO
+   ========================================================================== */
+body {
+    background-color: var(--cor-fundo-pagina) !important;
+    font-family: 'Lato', Helvetica, sans-serif !important;
+    color: var(--cor-texto-principal) !important;
+    background-image: none !important; /* Remove imagem direta */
+}
+
+/* Essa é a regra mágica que remove a sobreposição escura do prédio */
+body::before {
+    display: none !important;
+    background-image: none !important;
+    content: none !important;
+}
+
+/* ==========================================================================
+   2. TRANSFORMA CARDS PRETOS EM BRANCOS
+   ========================================================================== */
+/* Pega todas as variações de cards do seu sistema */
+.card, .login-card, .selection-card, .admin-container {
+    background-color: var(--cor-branco) !important;
+    color: var(--cor-texto-principal) !important;
+    border: 1px solid #e0e0e0 !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important; /* Sombra suave limpa */
+    border-radius: var(--borda-raio) !important;
+    backdrop-filter: none !important; /* Remove o desfoque do vidro */
+}
+
+/* ==========================================================================
+   3. TEXTOS E TÍTULOS
+   ========================================================================== */
+/* Títulos agora são Verdes (destaque) */
+.card-title, .login-title, h2, h3, h4 {
+    color: var(--cor-verde-principal) !important;
+    text-shadow: none !important; /* Remove sombra de texto antiga */
+}
+
+/* Labels de formulário (antes brancos, agora escuros) */
+label, .form-label {
+    color: var(--cor-texto-principal) !important;
+    font-weight: 700 !important;
+}
+
+/* Utilitários de texto que forçavam branco */
+.text-white {
+    color: var(--cor-texto-principal) !important;
+}
+.text-muted {
+    color: #666666 !important;
+}
+
+/* ==========================================================================
+   4. NAVBAR E MENUS (De Preto para Verde)
+   ========================================================================== */
+.navbar, .admin-navbar {
+    background-color: var(--cor-verde-principal) !important;
+    color: var(--cor-branco) !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+}
+
+.navbar-brand, .nav-link, .navbar-text, .admin-navbar span {
+    color: var(--cor-branco) !important;
+}
+
+/* ==========================================================================
+   5. BOTÕES E INPUTS (Padrão Novo)
+   ========================================================================== */
+.btn-primary, .btn-success, .btn-entrar, .system-select-btn {
+    background-color: var(--cor-verde-principal) !important;
+    border-color: var(--cor-verde-principal) !important;
+    color: var(--cor-branco) !important;
+    font-weight: 700 !important;
+    text-transform: uppercase;
+}
+
+.btn-primary:hover, .btn-success:hover, .btn-entrar:hover, .system-select-btn:hover {
+    background-color: var(--cor-verde-hover) !important;
+    border-color: var(--cor-verde-hover) !important;
+    transform: translateY(-1px);
+}
+
+.form-control {
+    background-color: var(--cor-input-fundo) !important;
+    border: 1px solid #ced4da !important;
+    color: var(--cor-texto-principal) !important;
+}
+
+.form-control:focus {
+    background-color: #fff !important;
+    border-color: var(--cor-verde-principal) !important;
+    box-shadow: 0 0 0 3px rgba(0, 163, 42, 0.2) !important;
+}
+
+/* Links (Esqueci a senha, etc) */
+a, .link-esqueci {
+    color: var(--cor-verde-principal) !important;
+    text-decoration: none;
+}
+a:hover, .link-esqueci:hover {
+    color: var(--cor-verde-hover) !important;
+    text-decoration: underline;
+}
+/* ==========================================================================
+   6. CORREÇÕES FINAIS (MODAL E LOGOUT)
+   ========================================================================== */
+
+/* 1. CORREÇÃO DO "X" NO MODAL */
+/* Força o cabeçalho do modal a ser VERDE */
+.modal-header {
+    background-color: var(--cor-verde-principal) !important;
+    border-bottom: none !important;
+}
+
+/* Força o botão X a ser BRANCO (para aparecer no fundo verde) */
+.modal-header .btn-close {
+    /* Este filtro inverte a cor padrão (preto) para branco */
+    filter: invert(1) grayscale(100%) brightness(200%) !important;
+    opacity: 1 !important; /* Remove transparência para ficar bem visível */
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center/1em auto no-repeat !important;
+}
+
+/* 2. CORREÇÃO DO LINK "SAIR" (TELA DE SELEÇÃO) */
+/* Antes era branco no preto. Agora será VERDE no fundo claro */
+#admin-logout, .logout-link, a[href*="logout"] {
+    color: var(--cor-verde-principal) !important; /* Verde do tema */
+    font-weight: 700 !important;
+    text-decoration: none !important;
+}
+
+#admin-logout:hover {
+    color: var(--cor-verde-hover) !important; /* Verde mais escuro no mouse */
+    text-decoration: underline !important;
+}
+
+/* Caso o card de seleção esteja com texto branco forçado, invertemos para preto */
+.selection-card p, .selection-card small, .selection-card .text-muted {
+    color: var(--cor-texto-principal) !important;
+}

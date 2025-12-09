@@ -24,10 +24,30 @@ public class HomologacaoController {
     @Autowired
     private ProntuarioRepository oficialRepo;
 
-    // 1. LISTAR PENDENTES (Ex: GET /api/homologacao/pendentes/63)
+    // --- NOVO: ENDPOINT PARA O ESTAGIÁRIO SALVAR (CRIA O PENDENTE) ---
+    @PostMapping("/salvar")
+    public ResponseEntity<String> salvarTemporario(@RequestBody ProntuarioTemporario novoProntuario) {
+        try {
+            // Define status inicial obrigatório conforme seu banco
+            novoProntuario.setStatus("PENDENTE"); 
+            
+            // Define data do procedimento se não vier preenchida
+            if (novoProntuario.getDataProced() == null) {
+                novoProntuario.setDataProced(LocalDate.now());
+            }
+
+            tempRepo.save(novoProntuario);
+            return ResponseEntity.ok("Prontuário salvo e enviado para homologação!");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Erro ao salvar: " + e.getMessage());
+        }
+    }
+
+    // 1. LISTAR PENDENTES
     @GetMapping("/pendentes/{idEspec}")
     public ResponseEntity<List<ProntuarioTemporario>> listarPendentes(@PathVariable Integer idEspec) {
-        // Atenção: Certifique-se que o método no Repository busca por STATUS_APROVACAO = 'PENDENTE'
+        // CORREÇÃO: No seu banco o status é 'PENDENTE', não 'AGUARDANDO'
+        // Certifique-se que no Repository a query também esteja buscando por 'PENDENTE'
         List<ProntuarioTemporario> lista = tempRepo.findPendentesPorEspecialidade(idEspec);
         return ResponseEntity.ok(lista);
     }
@@ -35,28 +55,28 @@ public class HomologacaoController {
     // 2. APROVAR
     @PostMapping("/aprovar/{idTemp}")
     public ResponseEntity<String> aprovar(@PathVariable int idTemp, @RequestParam Integer idSupervisor) {
+        
         Optional<ProntuarioTemporario> opt = tempRepo.findById(idTemp);
         
         if (opt.isPresent()) {
             ProntuarioTemporario temp = opt.get();
             
-            // A. Cria o registro na tabela OFICIAL (PRONTUARIO)
+            // Cria registro Oficial
             Prontuario oficial = new Prontuario();
             oficial.setIdPaciente(temp.getIdPaciente());
-            oficial.setIdProfissio(temp.getAluno().getIdprofissio()); // Aluno como autor
+            oficial.setIdProfissio(temp.getAluno().getId()); 
             oficial.setIdEspec(temp.getIdEspec());
             oficial.setIdProced(temp.getIdProced());
-            oficial.setDataProced(LocalDate.now()); // Data da homologação
+            oficial.setDataProced(temp.getDataProced()); // Usa a data original do procedimento
             oficial.setDescrProntu(temp.getTexto());
             oficial.setAutoPacVisu(temp.getAutoPacVisu());
-            // Link proced se existir...
             
             oficialRepo.save(oficial); 
 
-            // B. Atualiza o Temporário (Histórico de Decisão)
+            // Atualiza Temporário
             temp.setStatus("APROVADO");
-            temp.setIdSupervisor(idSupervisor); // Grava quem aprovou
-            temp.setDataDecisao(LocalDateTime.now()); // Grava quando
+            temp.setIdSupervisor(idSupervisor); 
+            temp.setDataDecisao(LocalDateTime.now()); 
             temp.setObservacaoSupervisor("Aprovado e integrado ao prontuário.");
             
             tempRepo.save(temp);
@@ -71,20 +91,27 @@ public class HomologacaoController {
     public ResponseEntity<String> corrigir(@PathVariable int idTemp, 
                                            @RequestParam Integer idSupervisor,
                                            @RequestBody String motivo) {
+        
         Optional<ProntuarioTemporario> opt = tempRepo.findById(idTemp);
         
         if (opt.isPresent()) {
             ProntuarioTemporario temp = opt.get();
             
-            // Muda status para REPROVADO (para o aluno corrigir)
             temp.setStatus("REPROVADO"); 
             temp.setIdSupervisor(idSupervisor);
             temp.setDataDecisao(LocalDateTime.now());
-            temp.setObservacaoSupervisor(motivo); // Motivo da reprovação
+            temp.setObservacaoSupervisor(motivo); 
             
             tempRepo.save(temp);
             return ResponseEntity.ok("Devolvido para correção.");
         }
         return ResponseEntity.badRequest().body("Erro ao processar.");
+    }
+
+    // 4. LISTAR CORREÇÕES PENDENTES (Para o Estagiário ver o que voltou)
+    @GetMapping("/correcoes/{idAluno}")
+    public ResponseEntity<List<ProntuarioTemporario>> listarCorrecoes(@PathVariable Integer idAluno) {
+        List<ProntuarioTemporario> lista = tempRepo.findReprovadosPorAluno(idAluno);
+        return ResponseEntity.ok(lista);
     }
 }

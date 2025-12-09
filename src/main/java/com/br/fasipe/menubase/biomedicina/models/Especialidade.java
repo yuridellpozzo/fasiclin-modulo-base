@@ -11,18 +11,18 @@ public class Especialidade {
 
     @Id
     @Column(name = "IDESPEC")
-    private Integer idespec;
+    private Integer id;
 
     @Column(name = "DESCESPEC")
     private String descespec;
 
     // Getters e Setters
     public Integer getIdespec() {
-        return idespec;
+        return id;
     }
 
-    public void setIdespec(Integer idespec) {
-        this.idespec = idespec;
+    public void setIdespec(Integer id) {
+        this.id = id;
     }
 
     public String getDescespec() {
