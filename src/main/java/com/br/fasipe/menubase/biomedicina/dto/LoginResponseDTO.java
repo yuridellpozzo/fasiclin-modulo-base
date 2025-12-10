@@ -9,10 +9,9 @@ public class LoginResponseDTO {
     private String tipoProfi;
     private String sistema;
     private boolean isSystemAdmin;
-    private List<String> especialidades;
-    private Long idProfissional; // Campo novo
+    private List<String> especialidades; // LISTA DE STRINGS SIMPLES
+    private Long idProfissional;
 
-    // Construtor Completo
     public LoginResponseDTO(String token, String nome, String cargo, String tipoProfi, String sistema, boolean isSystemAdmin, List<String> especialidades, Long idProfissional) {
         this.token = token;
         this.nome = nome;

@@ -1,7 +1,9 @@
 package com.br.fasipe.menubase.biomedicina.models;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "PRONTUARIO_TEMPORARIO")
@@ -9,54 +11,46 @@ public class ProntuarioTemporario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "IDPRONTU_TEMP")
-    private Integer idProntuTemp;
+    @Column(name = "IDPRONTU_TEMP") // Confirme se no banco é esse nome ou 'IDPRONTU'
+    private Integer id;
 
     @Column(name = "ID_PACIENTE")
-    private Integer idPaciente;
+    private Integer idPaciente; // Mantendo como Integer conforme seu padrão atual
 
-    @OneToOne
+    // --- RELACIONAMENTO CORRIGIDO ---
+    @ManyToOne 
     @JoinColumn(name = "ID_PROFISSIO")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "usuario", "especialidades"})
     private Profissional aluno;
 
-    @Column(name = "ID_ESPEC")
-    private Integer idEspec;
-
-    @Column(name = "ID_PROCED")
-    private Integer idProced;
-
-    @Column(name = "DATAPROCED")
-    private LocalDate dataProced;
-
+    @Column(name = "ID_ESPEC") private Integer idEspec;
+    @Column(name = "ID_PROCED") private Integer idProced;
+    @Column(name = "DATAPROCED") private LocalDate dataProced;
+    
     @Column(name = "DESCRPRONTU", columnDefinition = "TEXT")
     private String texto;
 
     @Column(name = "LINKPROCED")
-    private String linkProcedimento;
+    private String linkProced;
 
-    // --- CORREÇÃO AQUI: DE 'tinyint(1)' PARA 'Boolean' ---
     @Column(name = "AUTOPACVISU")
     private Boolean autoPacVisu;
 
-    // Enum no Banco: 'PENDENTE','APROVADO','REPROVADO'
     @Column(name = "STATUS_APROVACAO")
-    private String status; 
+    private String status;
 
     @Column(name = "ID_SUPERVISOR")
     private Integer idSupervisor;
-    
+
     @Column(name = "DATA_DECISAO")
-    private java.time.LocalDateTime dataDecisao; // Usei LocalDateTime para data e hora exata
+    private LocalDateTime dataDecisao;
 
     @Column(name = "MOTIVO_REPROVACAO", columnDefinition = "TEXT")
     private String observacaoSupervisor;
 
-    public ProntuarioTemporario() {}
-
     // --- GETTERS E SETTERS ---
-
-    public Integer getId() { return idProntuTemp; }
-    public void setId(Integer idProntuTemp) { this.idProntuTemp = idProntuTemp; }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
     public Integer getIdPaciente() { return idPaciente; }
     public void setIdPaciente(Integer idPaciente) { this.idPaciente = idPaciente; }
@@ -76,8 +70,8 @@ public class ProntuarioTemporario {
     public String getTexto() { return texto; }
     public void setTexto(String texto) { this.texto = texto; }
 
-    public String getLinkProcedimento() { return linkProcedimento; }
-    public void setLinkProcedimento(String linkProcedimento) { this.linkProcedimento = linkProcedimento; }
+    public String getLinkProced() { return linkProced; }
+    public void setLinkProced(String linkProced) { this.linkProced = linkProced; }
 
     public Boolean getAutoPacVisu() { return autoPacVisu; }
     public void setAutoPacVisu(Boolean autoPacVisu) { this.autoPacVisu = autoPacVisu; }
@@ -85,13 +79,12 @@ public class ProntuarioTemporario {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public String getObservacaoSupervisor() { return observacaoSupervisor; }
-    public void setObservacaoSupervisor(String observacaoSupervisor) { this.observacaoSupervisor = observacaoSupervisor; }
-
-    // --- ADICIONADOS QUE FALTAVAM ---
     public Integer getIdSupervisor() { return idSupervisor; }
     public void setIdSupervisor(Integer idSupervisor) { this.idSupervisor = idSupervisor; }
 
-    public java.time.LocalDateTime getDataDecisao() { return dataDecisao; }
-    public void setDataDecisao(java.time.LocalDateTime dataDecisao) { this.dataDecisao = dataDecisao; }
+    public LocalDateTime getDataDecisao() { return dataDecisao; }
+    public void setDataDecisao(LocalDateTime dataDecisao) { this.dataDecisao = dataDecisao; }
+
+    public String getObservacaoSupervisor() { return observacaoSupervisor; }
+    public void setObservacaoSupervisor(String observacaoSupervisor) { this.observacaoSupervisor = observacaoSupervisor; }
 }

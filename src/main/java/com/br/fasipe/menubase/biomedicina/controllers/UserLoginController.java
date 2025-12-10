@@ -1,3 +1,4 @@
+/* 
 package com.br.fasipe.menubase.biomedicina.controllers;
 
 import com.br.fasipe.menubase.biomedicina.models.Especialidade;
@@ -116,3 +117,4 @@ class LoginRequest {
     public String getSenha() { return senha; }
     public void setSenha(String senha) { this.senha = senha; }
 }
+*/

@@ -1,9 +1,6 @@
 package com.br.fasipe.menubase.biomedicina.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "ESPECIALIDADE")
@@ -14,22 +11,29 @@ public class Especialidade {
     private Integer id;
 
     @Column(name = "DESCESPEC")
-    private String descespec;
+    private String descEspec;
 
-    // Getters e Setters
-    public Integer getIdespec() {
+    // --- GETTERS E SETTERS ---
+
+    public Integer getId() {
         return id;
     }
 
-    public void setIdespec(Integer id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public String getDescespec() {
-        return descespec;
+    public String getDescEspec() {
+        return descEspec;
     }
 
-    public void setDescespec(String descespec) {
-        this.descespec = descespec;
+    public void setDescEspec(String descEspec) {
+        this.descEspec = descEspec;
+    }
+
+    // --- CORREÇÃO: CRIAMOS O MÉTODO getNome() ---
+    // Ele serve de "apelido" para o descEspec, para o AuthController funcionar
+    public String getNome() {
+        return descEspec;
     }
 }

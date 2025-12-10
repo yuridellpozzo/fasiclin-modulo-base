@@ -45,7 +45,8 @@
                 </div>
                 <div class="modal-body">
                     <form id="form-edicao">
-                        <input type="hidden" id="editIdTemp"> <input type="hidden" id="editIdPaciente">
+                        <input type="hidden" id="editIdTemp"> 
+                        <input type="hidden" id="editIdPaciente">
                         <input type="hidden" id="editIdProced">
                         
                         <div class="mb-3">
@@ -74,7 +75,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        const idProfissional = window.parent.localStorage.getItem('idProfissional') || 1; 
+        // Pega o ID do Profissional da memória (Login)
+        const idProfissional = window.parent.localStorage.getItem('idProfissional'); 
         const idEspec = 6; 
         let modalBootstrap;
 
@@ -85,6 +87,13 @@
 
         async function carregarCorrecoes() {
             const tbody = document.getElementById('tabela-correcoes');
+            
+            // Se não tiver ID logado, nem adianta buscar
+            if (!idProfissional) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Erro de Sessão: Faça login novamente.</td></tr>';
+                return;
+            }
+
             try {
                 const res = await fetch(`http://localhost:8080/api/homologacao/correcoes/${idProfissional}`);
                 if(!res.ok) throw new Error("Erro");
@@ -97,13 +106,17 @@
                 }
 
                 lista.forEach(item => {
-                    // Armazena o objeto inteiro no botão para facilitar a edição
+                    // Prepara o objeto para edição (Escape de aspas para não quebrar o HTML)
                     const dadosJson = JSON.stringify(item).replace(/"/g, '&quot;');
                     
+                    // Tenta pegar o ID do paciente de forma segura
+                    let idPac = item.idPaciente;
+                    if (!idPac && item.paciente) idPac = item.paciente.id;
+
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td>#${item.id}</td>
-                        <td>${item.idPaciente}</td>
+                        <td>${idPac || 'N/A'}</td>
                         <td class="text-danger fw-bold">${item.observacaoSupervisor || 'Sem motivo'}</td>
                         <td><span class="bg-reprovado">CORREÇÃO</span></td>
                         <td class="text-end">
@@ -113,34 +126,50 @@
                     tbody.appendChild(tr);
                 });
             } catch(e) {
+                console.error(e);
                 tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Erro de conexão.</td></tr>';
             }
         }
 
         function abrirEdicao(item) {
-            // Preenche o modal com os dados antigos
+            // Garante que pegamos os IDs corretos, mesmo se vierem aninhados
+            let idPac = item.idPaciente;
+            if (!idPac && item.paciente) idPac = item.paciente.id;
+
+            let idProc = item.idProced;
+            if (!idProc && item.procedimento) idProc = item.procedimento.id;
+
             document.getElementById('editIdTemp').value = item.id;
-            document.getElementById('editIdPaciente').value = item.idPaciente;
-            document.getElementById('editIdProced').value = item.idProced;
+            document.getElementById('editIdPaciente').value = idPac;
+            document.getElementById('editIdProced').value = idProc;
             document.getElementById('editTexto').value = item.texto;
-            document.getElementById('editLink').value = item.linkProcedimento;
+            document.getElementById('editLink').value = item.linkProced || item.linkProcedimento || ""; 
             document.getElementById('editAutoPacVisu').checked = item.autoPacVisu;
             
             modalBootstrap.show();
         }
 
         async function salvarCorrecao() {
+            // Pega o ID do campo oculto (Ex: 83)
+            const idTemp = document.getElementById('editIdTemp').value;
+
             const dados = {
-                id: document.getElementById('editIdTemp').value, // IMPORTANTE: Enviando o ID atualiza o existente!
-                idPaciente: document.getElementById('editIdPaciente').value,
-                aluno: { idprofissio: idProfissional },
+                // --- AQUI ESTAVA O PROBLEMA ---
+                // Precisamos enviar o ID para o Java saber que é uma EDIÇÃO
+                id: idTemp ? parseInt(idTemp) : null, 
+                // ------------------------------
+
+                idProfissional: parseInt(idProfissional), 
+                idPaciente: parseInt(document.getElementById('editIdPaciente').value),
+                idProced: parseInt(document.getElementById('editIdProced').value),
+                
                 idEspec: idEspec,
-                idProced: document.getElementById('editIdProced').value,
                 texto: document.getElementById('editTexto').value,
                 linkProcedimento: document.getElementById('editLink').value,
-                autoPacVisu: document.getElementById('editAutoPacVisu').checked,
-                status: "PENDENTE" // Força voltar para pendente
+                autoPacVisu: document.getElementById('editAutoPacVisu').checked
             };
+
+            console.log("Enviando para Atualização:", dados); // Debug: Veja se o 'id' aparece aqui
 
             try {
                 const res = await fetch('http://localhost:8080/api/homologacao/salvar', {
@@ -150,13 +179,17 @@
                 });
 
                 if (res.ok) {
-                    alert("Correção enviada com sucesso!");
+                    alert("Prontuário atualizado e reenviado para homologação!");
                     modalBootstrap.hide();
-                    carregarCorrecoes(); // Atualiza a lista (o item deve sumir)
+                    carregarCorrecoes(); // Atualiza a tabela (o item deve sumir)
                 } else {
-                    alert("Erro ao salvar.");
+                    const erroTxt = await res.text();
+                    alert("Erro ao salvar: " + erroTxt);
                 }
-            } catch(e) { alert("Erro de conexão."); }
+            } catch(e) { 
+                console.error(e);
+                alert("Erro de conexão."); 
+            }
         }
     </script>
 </body>

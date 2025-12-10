@@ -2,15 +2,19 @@ package com.br.fasipe.menubase.biomedicina.dto;
 
 public class ProntuarioDTO {
     
+    private Integer id; // <--- O CAMPO QUE FALTAVA PARA IDENTIFICAR EDIÇÃO
     private Integer idPaciente;
     private Integer idProced;
-    private Integer idProfissional; // O campo crítico
+    private Integer idProfissional; 
     private Integer idEspec;
     private String texto;
     private String linkProcedimento;
     private Boolean autoPacVisu;
 
     // --- GETTERS E SETTERS ---
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
+
     public Integer getIdPaciente() { return idPaciente; }
     public void setIdPaciente(Integer idPaciente) { this.idPaciente = idPaciente; }
 

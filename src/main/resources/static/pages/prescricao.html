@@ -86,41 +86,44 @@
         let CACHE_PROCEDIMENTOS = [];
 
         document.addEventListener('DOMContentLoaded', async () => {
-            const idProfissional = window.parent.localStorage.getItem('idProfissional') || 1; 
-            const idEspec = 6; // Fisioterapia
+            // Tenta pegar o ID. O "|| 1" é só para teste, o login deve preencher isso.
+            const idProfissionalStorage = window.parent.localStorage.getItem('idProfissional') || 1; 
+            const idEspec = 6; 
 
-            // 1. CARREGAR PACIENTES (Normal)
+            // 1. CARREGAR DADOS
             await carregarDropdownSimples('http://localhost:8080/api/dados/pacientes', 'selectPaciente', 'id', 'rg', 'Paciente');
-            
-            // 2. CARREGAR PROCEDIMENTOS E GUARDAR NA MEMÓRIA
             await inicializarProcedimentos();
 
-            // 3. EVENTO DE DIGITAÇÃO NO FILTRO
+            // 2. FILTRO
             document.getElementById('inputBuscaProced').addEventListener('input', (e) => {
-                const termo = e.target.value;
-                filtrarProcedimentos(termo);
+                filtrarProcedimentos(e.target.value);
             });
 
-            // 4. SALVAR
+            // 3. SALVAR (AQUI ESTAVA O PROBLEMA)
             document.getElementById('form-prescricao').addEventListener('submit', async (e) => {
                 e.preventDefault();
 
-                // Validação extra: O usuário selecionou algo no select?
                 const idProcedSelecionado = document.getElementById('selectProced').value;
                 if (!idProcedSelecionado) {
-                    alert("Por favor, clique em um procedimento na lista para selecioná-lo.");
+                    alert("Por favor, selecione um procedimento.");
                     return;
                 }
 
+                // --- JSON CORRIGIDO (PLANO) ---
                 const dados = {
                     idPaciente: document.getElementById('selectPaciente').value,
-                    aluno: { idprofissio: idProfissional }, 
+                    
+                    // Manda direto o ID (Integer), sem a estrutura 'aluno: {}'
+                    idProfissional: parseInt(idProfissionalStorage), 
+                    
                     idEspec: idEspec,
                     idProced: idProcedSelecionado,
                     texto: document.getElementById('textoProntuario').value,
                     linkProcedimento: document.getElementById('linkProced').value,
                     autoPacVisu: document.getElementById('autoPacVisu').checked
                 };
+
+                console.log("Enviando:", dados);
 
                 try {
                     const response = await fetch('http://localhost:8080/api/homologacao/salvar', {
@@ -132,7 +135,6 @@
                     if (response.ok) {
                         alert("Prontuário salvo com sucesso!");
                         document.getElementById('form-prescricao').reset();
-                        // Reseta o filtro de procedimentos
                         document.getElementById('inputBuscaProced').value = "";
                         filtrarProcedimentos(""); 
                     } else {

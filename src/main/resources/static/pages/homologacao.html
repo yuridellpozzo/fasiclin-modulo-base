@@ -11,8 +11,6 @@
         .table th { font-weight: 600; color: #555; }
         .status-badge { padding: 5px 10px; border-radius: 15px; font-size: 0.85rem; font-weight: 600; }
         .bg-pendente { background-color: #ffeeba; color: #856404; }
-        
-        /* Garante que o texto longo tenha quebra de linha no modal */
         .texto-leitura {
             white-space: pre-wrap; 
             background-color: #f8f9fa;
@@ -65,7 +63,6 @@
                 <div class="modal-body">
                     <h6 class="fw-bold text-muted">Descrição Completa do Procedimento:</h6>
                     <div id="textoCompleto" class="texto-leitura"></div>
-                    
                     <div class="mt-3" id="linkContainer" style="display: none;">
                         <strong>Link Externo:</strong> <a href="#" id="linkExterno" target="_blank">Acessar</a>
                     </div>
@@ -103,10 +100,8 @@
     <script>
         const ID_ESPEC = 6; 
         const idSupervisor = window.parent.localStorage.getItem('idProfissional') || 1; 
-        
-        // Variável global para guardar a lista e recuperar o texto completo depois
         let CACHE_LISTA = [];
-        let ID_SELECIONADO_LEITURA = null; // Para saber qual ID está aberto no modal de leitura
+        let ID_SELECIONADO_LEITURA = null;
 
         document.addEventListener('DOMContentLoaded', carregarPendentes);
 
@@ -116,75 +111,70 @@
 
             try {
                 const res = await fetch(`http://localhost:8080/api/homologacao/pendentes/${ID_ESPEC}`);
-                if (!res.ok) throw new Error('Erro ao buscar');
-                const lista = await res.json();
+                if (!res.ok) throw new Error('Erro na resposta da API');
                 
-                // Guarda na memória
+                const lista = await res.json();
                 CACHE_LISTA = lista;
-
                 tbody.innerHTML = '';
                 
-                if (lista.length === 0) {
+                if (!lista || lista.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">Nenhum prontuário pendente de aprovação.</td></tr>';
                     return;
                 }
 
-                lista.forEach(item => {
-                    const nomeAluno = item.aluno && item.aluno.pessoaFis ? item.aluno.pessoaFis.nomepessoa : (item.aluno ? "ID: " + item.aluno.idprofissio : "?");
-
+                lista.forEach(p => {
                     const tr = document.createElement('tr');
+                    
+                    // Tratamento seguro para exibir dados aninhados
+                    const idEstagiario = (p.aluno && p.aluno.id) ? p.aluno.id : 'N/A';
+                    const idPaciente = p.idPaciente || 'N/A';
+
                     tr.innerHTML = `
-                        <td>#${item.id}</td>
-                        <td>${item.idPaciente}</td>
-                        <td>${nomeAluno}</td>
-                        <td>${item.dataProced || '-'}</td>
-                        <td>${item.texto ? item.texto.substring(0, 40) + '...' : '-'}</td>
-                        <td><span class="status-badge bg-pendente">${item.status}</span></td>
-                        <td class="text-end">
-                            <button class="btn btn-sm btn-info text-white me-1" title="Ler Completo" onclick="verDetalhes(${item.id})">Ver</button>
-                            <button class="btn btn-sm btn-success me-1" title="Aprovar" onclick="aprovar(${item.id})">Aprovar</button>
-                            <button class="btn btn-sm btn-danger" title="Devolver" onclick="abrirModalCorrecao(${item.id})">Corrigir</button>
+                        <td>#${p.id}</td>
+                        <td>${idPaciente}</td>
+                        <td class="fw-bold text-primary">ID: ${idEstagiario}</td>
+                        <td>${p.dataProced || '-'}</td>
+                        <td>${p.texto ? p.texto.substring(0, 30) + '...' : ''}</td>
+                        <td><span class="badge bg-warning text-dark">${p.status}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-info me-1" onclick="verDetalhes(${p.id})">Ver</button>
+                            <button class="btn btn-sm btn-success me-1" onclick="aprovar(${p.id})">APROVAR</button>
+                            
+                            <button class="btn btn-sm btn-danger" onclick="abrirModalCorrecao(${p.id})">Corrigir</button>
                         </td>
                     `;
                     tbody.appendChild(tr);
                 });
 
             } catch (error) {
-                console.error(error);
-                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Erro de conexão.</td></tr>';
+                console.error("Erro ao carregar lista:", error);
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Erro ao carregar. Tente reiniciar o servidor.</td></tr>';
             }
         }
 
-        // --- NOVA FUNÇÃO: VER DETALHES ---
         function verDetalhes(id) {
-            // Busca o item na memória pelo ID
             const item = CACHE_LISTA.find(i => i.id === id);
-            
             if (item) {
                 ID_SELECIONADO_LEITURA = id;
                 document.getElementById('textoCompleto').textContent = item.texto || "Sem descrição.";
-                
                 const linkDiv = document.getElementById('linkContainer');
                 const linkTag = document.getElementById('linkExterno');
                 
-                if (item.linkProcedimento) {
+                // Verifica nomes possíveis do campo link
+                const link = item.linkProced || item.linkProcedimento;
+                if (link) {
                     linkDiv.style.display = 'block';
-                    linkTag.href = item.linkProcedimento;
+                    linkTag.href = link;
                 } else {
                     linkDiv.style.display = 'none';
                 }
-
                 new bootstrap.Modal(document.getElementById('modalVisualizar')).show();
             }
         }
 
-        // --- AÇÃO RÁPIDA DENTRO DO MODAL DE LEITURA ---
         function fecharModalEAcionar(acao) {
-            // Fecha o modal de leitura
             const modalLeitura = bootstrap.Modal.getInstance(document.getElementById('modalVisualizar'));
             modalLeitura.hide();
-
-            // Aciona a função correspondente após um pequeno delay visual
             setTimeout(() => {
                 if (acao === 'aprovar') aprovar(ID_SELECIONADO_LEITURA);
                 if (acao === 'corrigir') abrirModalCorrecao(ID_SELECIONADO_LEITURA);
@@ -192,19 +182,11 @@
         }
 
         async function aprovar(id) {
-            if(!confirm("Confirma a aprovação deste prontuário? Ele será oficializado.")) return;
-
+            if(!confirm("Confirma a aprovação deste prontuário?")) return;
             try {
-                const res = await fetch(`http://localhost:8080/api/homologacao/aprovar/${id}?idSupervisor=${idSupervisor}`, {
-                    method: 'POST'
-                });
-
-                if (res.ok) {
-                    alert("Aprovado com sucesso!");
-                    carregarPendentes();
-                } else {
-                    alert("Erro ao aprovar.");
-                }
+                const res = await fetch(`http://localhost:8080/api/homologacao/aprovar/${id}?idSupervisor=${idSupervisor}`, { method: 'POST' });
+                if (res.ok) { alert("Aprovado com sucesso!"); carregarPendentes(); } 
+                else { alert("Erro ao aprovar: " + await res.text()); }
             } catch (e) { alert("Erro de conexão."); }
         }
 
@@ -217,22 +199,18 @@
         async function enviarCorrecao() {
             const id = document.getElementById('idTempCorrecao').value;
             const motivo = document.getElementById('motivoCorrecao').value;
-
             if(!motivo) { alert("Escreva o motivo."); return; }
-
             try {
                 const res = await fetch(`http://localhost:8080/api/homologacao/corrigir/${id}?idSupervisor=${idSupervisor}`, {
                     method: 'POST',
                     headers: {'Content-Type': 'text/plain'}, 
                     body: motivo
                 });
-
                 if (res.ok) {
                     alert("Devolvido para correção!");
-                    location.reload(); 
-                } else {
-                    alert("Erro ao enviar.");
-                }
+                    bootstrap.Modal.getInstance(document.getElementById('modalCorrecao')).hide();
+                    carregarPendentes();
+                } else { alert("Erro ao enviar."); }
             } catch (e) { alert("Erro de conexão."); }
         }
     </script>

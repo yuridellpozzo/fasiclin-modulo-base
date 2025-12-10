@@ -8,11 +8,15 @@ import java.util.List;
 
 public interface ProntuarioTemporarioRepository extends JpaRepository<ProntuarioTemporario, Integer> {
     
-    // Lista para o Supervisor (Status PENDENTE)
-    @Query(value = "SELECT * FROM PRONTUARIO_TEMPORARIO WHERE ID_ESPEC = :idEspec AND STATUS_APROVACAO = 'PENDENTE'", nativeQuery = true)
+    // --- CORREÇÃO: USANDO 'JOIN FETCH' ---
+    // O comando 'JOIN FETCH p.aluno' é vital. Ele diz ao banco: 
+    // "Traga o Prontuário E TAMBÉM os dados do Aluno dono dele agora mesmo".
+    
+    // 1. Lista para o Supervisor (PENDENTE)
+    @Query("SELECT p FROM ProntuarioTemporario p JOIN FETCH p.aluno WHERE p.idEspec = :idEspec AND p.status = 'PENDENTE'")
     List<ProntuarioTemporario> findPendentesPorEspecialidade(@Param("idEspec") Integer idEspec);
 
-    // --- NOVO: Lista para o Estagiário (Status REPROVADO e ID dele) ---
-    @Query(value = "SELECT * FROM PRONTUARIO_TEMPORARIO WHERE ID_PROFISSIO = :idAluno AND STATUS_APROVACAO = 'REPROVADO'", nativeQuery = true)
+    // 2. Lista para o Estagiário (REPROVADO)
+    @Query("SELECT p FROM ProntuarioTemporario p JOIN FETCH p.aluno WHERE p.aluno.id = :idAluno AND p.status = 'REPROVADO'")
     List<ProntuarioTemporario> findReprovadosPorAluno(@Param("idAluno") Integer idAluno);
 }
