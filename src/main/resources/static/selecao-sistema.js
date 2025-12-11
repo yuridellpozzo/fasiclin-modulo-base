@@ -2,60 +2,58 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const tipoProfi = localStorage.getItem('tipoProfi');
     const isSystemAdmin = localStorage.getItem('isSystemAdmin') === 'true';
-    const userEspecialidades = JSON.parse(localStorage.getItem('userEspecialidades') || '[]');
+    
+    // --- CORREÇÃO 1: Usar o nome correto da chave (userSpecialties) ---
+    // Tenta ler 'userSpecialties' (novo) ou 'userEspecialidades' (velho) para garantir
+    const rawSpecialties = localStorage.getItem('userSpecialties') || localStorage.getItem('userEspecialidades');
+    const userEspecialidades = JSON.parse(rawSpecialties || '[]');
 
-    // --- 1. GUARDA DE SEGURANÇA ATUALIZADA ---
-    // Permite entrar se for Admin Geral (isSystemAdmin) OU Master (4)
+    console.log("Sistemas carregados:", userEspecialidades); // Debug para você ver no F12
+
+    // --- 1. GUARDA DE SEGURANÇA ---
     if (!isSystemAdmin && tipoProfi !== '4') {
         alert("Acesso negado. Apenas Administradores ou Masters podem acessar esta página.");
         window.location.href = '/index.html';
         return;
     }
 
-    // --- 2. LÓGICA DOS BOTÕES DE SELEÇÃO ---
-    const buttonContainer = document.querySelector('.d-grid.gap-3');
+    // --- 2. LÓGICA DOS BOTÕES ---
     const allButtons = document.querySelectorAll('.system-select-btn');
 
-    // Se for MASTER (Tipo 4), precisamos filtrar os botões
+    // Se for MASTER (Tipo 4) e não for Admin Geral
     if (tipoProfi === '4' && !isSystemAdmin) {
         
-        // Esconde todos os botões primeiro
+        // Esconde todos primeiro
         allButtons.forEach(btn => btn.style.display = 'none');
 
-        // Mostra apenas os botões das especialidades do Master
-        userEspecialidades.forEach(espec => {
-            const systemName = espec.nome.toUpperCase(); // Ex: "BIOMEDICINA"
+        // Mostra apenas os permitidos
+        userEspecialidades.forEach(item => {
+            // --- CORREÇÃO 2: O Java manda Strings direto ("BIOMEDICINA"), não objetos ---
+            // Verifica se 'item' é objeto (velho) ou string (novo)
+            const systemName = (typeof item === 'string') ? item : item.nome; 
             
-            // Tenta encontrar um botão existente para esse sistema
-            const targetBtn = document.querySelector(`.system-select-btn[data-system="${systemName}"]`);
-            
-            if (targetBtn) {
-                targetBtn.style.display = 'block'; // Mostra o botão
-            } else {
-                // Opcional: Se não existir botão (ex: um curso novo), cria um aviso ou botão genérico
-                console.warn(`Nenhum botão encontrado para o sistema: ${systemName}`);
+            if (systemName) {
+                const selector = `.system-select-btn[data-system="${systemName.toUpperCase()}"]`;
+                const targetBtn = document.querySelector(selector);
+                
+                if (targetBtn) {
+                    targetBtn.style.display = 'block';
+                }
             }
         });
     } 
-    // Se for Admin Geral, ele já vê todos os botões (padrão do HTML)
+    // Se for Admin Geral (isSystemAdmin), ele mantém todos visíveis (padrão do CSS)
 
-
-    // --- 3. AÇÃO DO CLIQUE NOS BOTÕES ---
+    // --- 3. AÇÃO DO CLIQUE ---
     allButtons.forEach(button => {
         button.addEventListener('click', () => {
             const selectedSystem = button.getAttribute('data-system');
-            
-            console.log(`Usuário selecionou o sistema: ${selectedSystem}`);
-
-            // Salva a escolha
             localStorage.setItem('sistemaSelecionado', selectedSystem);
-
-            // Redireciona para a tela principal
             window.location.href = '/pages/tela-principal.html';
         });
     });
 
-    // --- 4. LÓGICA DO LOGOUT ---
+    // --- 4. LOGOUT ---
     const logoutButton = document.getElementById('admin-logout');
     if (logoutButton) {
         logoutButton.addEventListener('click', (event) => {
