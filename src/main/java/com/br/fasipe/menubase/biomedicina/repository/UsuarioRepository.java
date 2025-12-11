@@ -16,13 +16,20 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     @Query(value = "SELECT NOMEPESSOA FROM PESSOA WHERE IDPESSOA = :idPessoa", nativeQuery = true)
     String findNomeByIdPessoa(@Param("idPessoa") Integer idPessoa);
 
+    // --- NOVA BUSCA HÍBRIDA (LOGIN ou EMAIL) ---
+    @Query(value = "SELECT u.* FROM USUARIO u " +
+                   "INNER JOIN PESSOAFIS pf ON u.ID_PESSOAFIS = pf.IDPESSOAFIS " +
+                   "INNER JOIN PESSOA p ON pf.ID_PESSOA = p.IDPESSOA " +
+                   "WHERE u.LOGUSUARIO = :texto OR p.EMAIL = :texto", nativeQuery = true)
+    Optional<Usuario> findByLoginOrEmail(@Param("texto") String texto);
+
+    // Manter seus outros métodos
     @Query(value = "SELECT u.* FROM USUARIO u " +
                    "JOIN PESSOAFIS pf ON u.ID_PESSOAFIS = pf.IDPESSOAFIS " +
                    "JOIN PESSOA p ON pf.ID_PESSOA = p.IDPESSOA " +
                    "WHERE p.EMAIL = :email LIMIT 1", nativeQuery = true)
     Optional<Usuario> findByEmailPessoa(@Param("email") String email);
 
-    // --- NOVO: DELETE NATIVO (Ignora erros de memória do Hibernate) ---
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM USUARIO WHERE IDUSUARIO = :id", nativeQuery = true)

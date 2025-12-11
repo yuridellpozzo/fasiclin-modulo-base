@@ -2,22 +2,24 @@ package com.br.fasipe.menubase.biomedicina.controllers;
 
 import com.br.fasipe.menubase.biomedicina.dto.LoginDTO;
 import com.br.fasipe.menubase.biomedicina.dto.LoginResponseDTO;
-import com.br.fasipe.menubase.biomedicina.dto.RedefinirSenhaDTO; // DTO para senha
+import com.br.fasipe.menubase.biomedicina.dto.RedefinirSenhaDTO;
 import com.br.fasipe.menubase.biomedicina.models.Especialidade;
 import com.br.fasipe.menubase.biomedicina.models.Pessoa;
 import com.br.fasipe.menubase.biomedicina.models.Usuario;
 import com.br.fasipe.menubase.biomedicina.repository.PessoaRepository;
 import com.br.fasipe.menubase.biomedicina.repository.UsuarioRepository;
-import com.br.fasipe.menubase.biomedicina.services.RecuperacaoSenhaService; // Service de Recuperação
+import com.br.fasipe.menubase.biomedicina.services.RecuperacaoSenhaService;
 import com.br.fasipe.menubase.biomedicina.services.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -25,11 +27,10 @@ import java.util.Set;
 public class AuthController {
 
     @Autowired private UsuarioRepository usuarioRepo;
-    @Autowired private TokenService tokenService; // JWT Login
+    @Autowired private TokenService tokenService;
+    @Autowired private RecuperacaoSenhaService recuperacaoService;
     @Autowired private PessoaRepository pessoaRepo;
-    @Autowired private RecuperacaoSenhaService recuperacaoService; // <--- INJEÇÃO NOVA
 
-    // --- 1. LOGIN (MANTIDO EXATAMENTE COMO VOCÊ ENVIOU) ---
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDTO data) {
         Optional<Usuario> userOpt = usuarioRepo.findByLogin(data.getLogin());
@@ -52,21 +53,26 @@ public class AuthController {
             else if ("3".equals(tipoCodigo)) nomeCargo = "Supervisor";
             else if ("4".equals(tipoCodigo)) nomeCargo = "Master / Coordenador";
 
-            String sistema = "SEM VÍNCULO"; 
+            String sistema = "SEM VINCULO"; 
             List<String> listaEspec = new ArrayList<>();
 
-            // REGRA ORIGINAL: Apenas ADMIN (1) vê tudo. Master (4) segue regra do banco.
+            // REGRA: Admin vê tudo
             if ("1".equals(tipoCodigo)) {
                 sistema = "ADMINISTRADOR"; 
                 listaEspec.add("BIOMEDICINA"); listaEspec.add("FISIOTERAPIA"); 
                 listaEspec.add("ODONTOLOGIA"); listaEspec.add("NUTRICAO"); listaEspec.add("PSICOLOGIA");
             } 
+            // REGRA: Outros (Inclusive Master) buscam do banco, mas HIGIENIZADO
             else if (user.getProfissional() != null) {
                 Set<Especialidade> especialidades = user.getProfissional().getEspecialidades();
                 if (especialidades != null && !especialidades.isEmpty()) {
-                    sistema = especialidades.iterator().next().getNome().toUpperCase();
+                    
+                    // Pega o primeiro e LIMPA (Nutrição -> NUTRICAO)
+                    sistema = higienizarTexto(especialidades.iterator().next().getNome());
+                    
                     for (Especialidade e : especialidades) {
-                        listaEspec.add(e.getNome());
+                        // Limpa cada especialidade da lista
+                        listaEspec.add(higienizarTexto(e.getNome()));
                     }
                 }
             }
@@ -80,11 +86,11 @@ public class AuthController {
                 }
             } catch (Exception e) { }
 
-            // LOG NO TERMINAL
+            // LOG
             System.out.println("---------------------------------------------------------");
             System.out.println("LOGIN SUCESSO -> Usuário: " + nomeExibicao);
             System.out.println("              -> Cargo:   " + nomeCargo);
-            System.out.println("              -> Sistema: " + sistema);
+            System.out.println("              -> Sistema: " + sistema); // Agora vai aparecer sem acento!
             System.out.println("---------------------------------------------------------");
 
             return ResponseEntity.ok(new LoginResponseDTO(
@@ -101,53 +107,64 @@ public class AuthController {
         return ResponseEntity.status(401).body("Usuário ou senha inválidos.");
     }
     
-    // --- 2. SOLICITAR CÓDIGO (USANDO O SERVICE NOVO) ---
+    // --- FUNÇÃO DE LIMPEZA (REMOVE ACENTOS E Ç) ---
+    private String higienizarTexto(String texto) {
+        if (texto == null) return "";
+        
+        // 1. Remove acentos (Normalizer separa 'ã' em 'a' + '~')
+        String normalizado = Normalizer.normalize(texto, Normalizer.Form.NFD);
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        String semAcento = pattern.matcher(normalizado).replaceAll("");
+        
+        // 2. Garante Maiúsculas e remove espaços extras
+        String limpo = semAcento.toUpperCase().trim();
+        
+        // 3. Ajustes manuais de segurança (caso o Normalizer falhe em algum ambiente)
+        limpo = limpo.replace("Ç", "C");
+        
+        // 4. (Opcional) Se Psicologia estiver vindo como "PSICOLOGIA CLINICA", cortamos para pegar só a primeira palavra?
+        // Descomente a linha abaixo se quiser forçar pegar só a primeira palavra (ex: "ENGENHARIA CIVIL" -> "ENGENHARIA")
+        // if (limpo.contains(" ")) limpo = limpo.split(" ")[0];
+
+        return limpo;
+    }
+
+    // --- ATUALIZAÇÃO: BUSCA POR LOGIN OU EMAIL ---
     @PostMapping("/esqueci-senha")
     public ResponseEntity<String> solicitarToken(@RequestBody String loginOuEmail) {
-        String loginLimpo = loginOuEmail.replace("\"", "").trim();
-        Optional<Usuario> userOpt = usuarioRepo.findByLogin(loginLimpo);
+        // Limpa as aspas que o JSON as vezes manda
+        String textoLimpo = loginOuEmail.replace("\"", "").trim();
+        
+        // Usa o novo método do repositório que busca nas duas colunas
+        Optional<Usuario> userOpt = usuarioRepo.findByLoginOrEmail(textoLimpo);
         
         if (userOpt.isPresent()) {
-            // Gera o código e guarda na memória do Service
             String codigo = recuperacaoService.gerarCodigo(userOpt.get().getLogin());
-            
             System.out.println("\n##################################################");
             System.out.println(">>> RECUPERAÇÃO DE SENHA SOLICITADA <<<");
             System.out.println(">>> CÓDIGO GERADO: " + codigo + " <<<");
             System.out.println("##################################################\n");
-
-            return ResponseEntity.ok("Código enviado para o terminal do servidor.");
+            return ResponseEntity.ok("Código enviado.");
         }
-        return ResponseEntity.badRequest().body("Usuário não encontrado.");
+        
+        return ResponseEntity.badRequest().body("Usuário ou E-mail não encontrado no sistema.");
     }
 
-    // --- 3. GRAVAR NOVA SENHA NO BANCO ---
     @PostMapping("/redefinir-senha")
     public ResponseEntity<String> redefinirSenha(@RequestBody RedefinirSenhaDTO dados) {
-        
-        // 1. Valida se o código existe e pega o login do dono
         String loginUser = recuperacaoService.validarCodigo(dados.getToken());
-
         if (loginUser == null) return ResponseEntity.badRequest().body("Código inválido.");
         if (loginUser.equals("EXPIRED")) return ResponseEntity.badRequest().body("Código expirado.");
         
-        // 2. Busca o usuário no banco
         Optional<Usuario> userOpt = usuarioRepo.findByLogin(loginUser);
-        
         if (userOpt.isPresent()) {
             Usuario user = userOpt.get();
-            
-            // 3. ALTERA A SENHA E SALVA NO BANCO
             user.setSenha(dados.getNovaSenha()); 
-            usuarioRepo.save(user); // <--- O UPDATE ACONTECE AQUI
-            
-            // 4. Queima o código para não usar de novo
+            usuarioRepo.save(user);              
             recuperacaoService.queimarCodigo(dados.getToken());
-            
-            System.out.println(">>> SUCESSO: Senha alterada no banco para: " + loginUser);
-            return ResponseEntity.ok("Senha alterada com sucesso!");
+            System.out.println(">>> SENHA ALTERADA PARA: " + loginUser);
+            return ResponseEntity.ok("Sucesso!");
         }
-        
-        return ResponseEntity.badRequest().body("Erro ao encontrar usuário.");
+        return ResponseEntity.badRequest().body("Erro.");
     }
 }
